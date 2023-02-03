@@ -1,0 +1,30 @@
+#!/bin/sh
+
+project_tag=${project_tag}
+name=${name_tag}
+aws_region=${aws_region}
+container_name=${container_name}
+ngen_catchment_file=${ngen_catchment_file}
+ngen_nexus_file=${ngen_nexus_file}
+ngen_realization_file=${ngen_realization_file}
+bucket_name=${bucket_name}
+
+
+sudo dnf -y install docker
+sudo usermod -a -G docker ec2-user
+id ec2-user
+sudo systemctl start docker.service
+
+
+
+sudo apt-get install s3fs
+sudo s3fs \
+    -o iam_role="auto" \
+    -o url="https://s3-${aws_region}.amazonaws.com" \
+    -o umask=000 \
+    -o allow_other \
+    ${bucket_name} /mnt
+
+sudo docker pull zwills/dmod_ngen_slim
+sudo docker run --rm -it ${container_name} "${ngen_catchment_file}" "" "${ngen_nexus_file}" "" ${ngen_realization_file}
+
