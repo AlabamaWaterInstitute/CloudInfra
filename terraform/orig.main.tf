@@ -13,7 +13,7 @@ provider "aws" {
 
 resource "aws_vpc" "cloud_vpc" {
   # This is a large vpc, 256 x 256 IPs available
-   cidr_block = "100.0.0.0/16"
+   cidr_block = "172.31.0.0/16"
    enable_dns_support = true
    enable_dns_hostnames = true
    tags = {
@@ -25,7 +25,7 @@ resource "aws_vpc" "cloud_vpc" {
 resource "aws_subnet" "main" {
   vpc_id   = aws_vpc.cloud_vpc.id
   # This subnet will allow 256 IPs
-  cidr_block = "100.1.0.0/24"
+  cidr_block = "172.31.1.0/24"
   availability_zone = var.availability_zone
    tags = {
       Name = "${var.name_tag} Subnet"
@@ -170,12 +170,12 @@ resource "aws_network_interface" "efa_network_adapter" {
   }
 }
 
-#resource "aws_key_pair" "default" {
-#  # Strange: This creates a new key-pair with name key_name in AWS
-#  # Which is completely unused here since we provide the public key for an existing private key
-#   key_name = var.key_name
-#   public_key = var.public_key
-#}
+resource "aws_key_pair" "default" {
+ # Strange: This creates a new key-pair with name key_name in AWS
+ # Which is completely unused here since we provide the public key for an existing private key
+  key_name = var.key_name
+  public_key = var.public_key
+}
 
 data "aws_ec2_instance_type" "head_node" {
   instance_type = var.instance_type
@@ -195,7 +195,7 @@ resource "aws_instance" "head_node" {
   depends_on = [aws_internet_gateway.gw]
   key_name = var.key_name
   iam_instance_profile = aws_iam_instance_profile.example_iam_instance_profile.name
-  user_data = templatefile("script.tftpl", { project_tag = "var.project_tag", name_tag = "var.name_tag", aws_region = "var.aws_region", container_name = "var.container_name", ngen_catchment_file = "var.ngen_catchment_file", ngen_nexus_file = "var.ngen_nexus_file", ngen_realization_file = "var.ngen_realization_file", bucket_name = "var.bucket_name" })
+  user_data = templatefile("script.tftpl", { project_tag = var.project_tag, name_tag = var.name_tag, aws_region = var.aws_region, container_name = var.container_name, ngen_catchment_file = var.ngen_catchment_file, ngen_nexus_file = var.ngen_nexus_file, ngen_realization_file = var.ngen_realization_file, bucket_name = var.bucket_name })
   associate_public_ip_address = true
   subnet_id = aws_subnet.main.id
   vpc_security_group_ids = [
