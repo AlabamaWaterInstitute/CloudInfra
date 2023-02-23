@@ -1,74 +1,59 @@
-# CloudInfra
-Initial Terraform for the CIROH Cloud 
+# CIROH Cloud Terraform Configuration
 
-To build [dockerfile](/docker/Dockerfile) run `docker buildx build -f /docker/Dockerfile --platform=linux/amd64 -t $CONTAINER_NAME .`
+This Terraform configuration is used to build and manage resources on the CIROH cloud, including an EC2 instance running a containerized model.
 
-and to run the Terraform, run a validate: `terraform validate` and then `terraform plan -o plan.file` and `terraform apply plan.file` and fill out the TF variables. 
+## Docker Build
+To build the Dockerfile, run the following command:
+```bash
+docker buildx build -f /docker/Dockerfile --platform=linux/amd64 -t $CONTAINER_NAME .
+```
 
-variable "aws_region"
-"Preferred region in which to launch EC2 instances. Defaults to us-east-1"
-default     = "us-east-1"
+## Terraform validate
 
-variable "nameprefix"
-description = "Prefix to use for some resource names to avoid duplicates"
-default     = "Cloud-Example"
+- GitHub Actions will run Terraform validation every time a push or pull request is made to a branch - `main` and includes changes to the Terraform files in the terraform directory.
 
-variable "name_tag" 
-description = "Value of the Name tag for the EC2 instance"
-default     = "Cloud-Example-Terraform"
+** Note that the terraform init command is also included in the workflow. This command initializes the Terraform working directory and downloads the necessary providers and modules. It is required before running terraform validate to ensure that all dependencies are available.
 
-variable "project_tag"
-description = "Value of the Project tag for the EC2 instance"
-default     = "Cloud-Example" 
+## Terraform Usage
 
-variable "availability_zone"
-description = "Availability zone to use"
-default     = "us-east-1a"
+To run the Terraform configuration, follow these steps:
 
-variable "instance_type" 
-description = "[EC2 Instance Type](https://instances.vantage.sh/)"
-larger instance = "c5n.18xlarge"
-default = "t3.medium"
+1. Generate a plan file by running terraform plan -o plan.file.
+2. Apply the plan file by running terraform apply plan.file and fill out the Terraform variables.
 
-variable "use_efa"
-description = "[Attach EFA Network](https://aws.amazon.com/hpc/efa/)"
-default = "true"
+## Terraform Variables
+The following variables can be customized:
 
-variable "key_name" 
-description = "The name of the ssh key-pair used to access the EC2 instances"
-#default     = "terraform-key.pem"
+`aws_region`: The preferred region in which to launch EC2 instances. Defaults to us-east-1.
 
-variable "container_name" 
-description = "The name of the conatinerized model to run"
-default     = "zwills/dmod_ngen_slim"
+`nameprefix`: Prefix to use for some resource names to avoid duplicates. Default value is "Cloud-Example".
 
-variable "ngen_catchment_file"
-description = "The path of the catchment file, /mnt is the S3 mount default; then path to examples in the ngen repo"
-#default     = "/mnt/ngen/ngen/data/catchment_data.geojson"
+`name_tag`: Value of the Name tag for the EC2 instance. Default value is "Cloud-Example-Terraform".
 
-variable "ngen_nexus_file"
-description = "The path of the nexus file, /mnt is the S3 mount default; examples in the ngen repo"
-#default     = "/mnt/ngen/ngen/data/nexus_data.geojson"
+`project_tag`: Value of the Project tag for the EC2 instance. Default value is "Cloud-Example".
 
-variable "ngen_realization_file"
-  description = "The path of the ngen realization file, /mnt is the S3 mount default; examples in the ngen repo"
-  #default     = "/mnt/ngen/ngen/data/test_bmi_multi_realization_config.json"
+`availability_zone`: Availability zone to use. Default value is "us-east-1a".
 
-variable "allowed_ssh_cidr"
-  description = "Public IP address/range allowed for SSH access"
+`instance_type`: EC2 Instance Type. Larger instance is "c5n.18xlarge". Default value is "t3.medium".
 
-variable "bucket_name"
-  description = "S3 Bucket Name for AWS bucket to mount (at /mnt) for data"
+`use_efa`: Attach EFA Network. Default value is "true".
 
-variable "public_key"
-  description = "Contents of the SSH public key to be used for authentication"
+`key_name`: The name of the ssh key-pair used to access the EC2 instances.
 
-variable "managed_policies"
-description = "The attached IAM policies granting machine permissions"
-default = ["arn:aws:iam::aws:policy/AmazonEC2FullAccess",
-           "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-           "arn:aws:iam::aws:policy/AmazonFSxFullAccess"]
+`container_name`: The name of the containerized model to run. Default value is "zwills/dmod_ngen_slim".
 
-variable "ami_id" 
-description = "The random ID used for [AMIs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html)"
-default="unknown value"
+`ngen_catchment_file`: The path of the catchment file, /mnt is the S3 mount default; then path to examples in the ngen repo.
+
+`ngen_nexus_file`: The path of the nexus file, /mnt is the S3 mount default; examples in the ngen repo.
+
+`ngen_realization_file`: The path of the ngen realization file, /mnt is the S3 mount default; examples in the ngen repo.
+
+`allowed_ssh_cidr`: Public IP address/range allowed for SSH access.
+
+`bucket_name`: S3 Bucket Name for AWS bucket to mount (at /mnt) for data.
+
+`public_key`: Contents of the SSH public key to be used for authentication.
+
+`managed_policies`: The attached IAM policies granting machine permissions. Default value is ["arn:aws:iam::aws:policy/AmazonEC2FullAccess", "arn:aws:iam::aws:policy/AmazonS3FullAccess", "arn:aws:iam::aws:policy/AmazonFSxFullAccess"].
+
+`ami_id`: The random ID used for AMIs. Default value is "unknown value".
