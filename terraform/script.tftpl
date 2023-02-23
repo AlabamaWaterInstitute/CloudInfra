@@ -9,22 +9,23 @@ ngen_nexus_file=${ngen_nexus_file}
 ngen_realization_file=${ngen_realization_file}
 bucket_name=${bucket_name}
 
-
-sudo dnf -y install docker
+sudo yum -y install docker
 sudo usermod -a -G docker ec2-user
 id ec2-user
 sudo systemctl start docker.service
 
+sudo amazon-linux-extras install epel
+sudo yum -y install s3fs-fuse
 
-
-sudo apt-get install s3fs
 sudo s3fs \
     -o iam_role="auto" \
-    -o url="https://s3-${aws_region}.amazonaws.com" \
     -o umask=000 \
     -o allow_other \
     ${bucket_name} /mnt
 
 sudo docker pull zwills/dmod_ngen_slim
-sudo docker run --rm -it ${container_name} "${ngen_catchment_file}" "" "${ngen_nexus_file}" "" ${ngen_realization_file}
+# sudo docker run --rm -it -v /mnt/ngen/ngen:/mnt/ngen/ngen --platform=linux/amd64 zwills/dmod_ngen_slim
+# Need to mount the S3 bucket into the docker container if you want to use it.
+sudo docker run --rm -it ${container_name} ${ngen_catchment_file} "" ${ngen_nexus_file} "" ${ngen_realization_file}
+
 
