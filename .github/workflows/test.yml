@@ -2,8 +2,6 @@ on:
   push:
     branches:
       - 'branch-**'
-    paths:
-      - terraform/**
 jobs:
   validate-terraform:
     runs-on: ubuntu-latest
