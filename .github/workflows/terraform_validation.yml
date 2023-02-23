@@ -1,5 +1,4 @@
-name: Terraform Validation
-'on':
+on:
   push:
     branches:
       - main
