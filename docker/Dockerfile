@@ -30,7 +30,7 @@ ARG TROUTE_COMMIT
 
 #### Default arguments for required dependencies needed during various build stages
 # The Rocky-Linux-based "base" stage, rocky-base
-ARG ROCKY_BASE_REQUIRED="sudo openssh openssh-server bash git"
+ARG ROCKY_BASE_REQUIRED="sudo bash git"
 # The Rocky-Linux-based "ngen-deps" stage, rocky-ngen-deps
 # TODO: later look at separating build and run images again, and install static lib netcdf packages in run images
 #ARG ROCKY_NGEN_DEPS_REQUIRED="mpich mpich-devel sudo gcc gcc-c++ make cmake tar git gcc-gfortran libgfortran \
@@ -72,7 +72,7 @@ ARG NGEN_UDUNITS_QUIET="ON"
 
 ARG BUILD_NGEN_SERIAL="true"
 ARG BUILD_NGEN_PARALLEL="true"
-ARG BUILD_PARTITIONER="false"
+ARG BUILD_NGEN_PARTITIONER="true"
 ARG BUILD_NOAH_OWP="true"
 ARG BUILD_CFE="true"
 ARG BUILD_TOPMODEL="true"
@@ -86,7 +86,6 @@ FROM rockylinux:8.5 as rocky-base
 
 ARG USER=mpi
 ENV USER=${USER} USER_HOME=/home/${USER}
-ENV SSHDIR=${USER_HOME}/.ssh
 
 ARG ROCKY_BASE_REQUIRED
 
@@ -101,34 +100,12 @@ RUN dnf update -y \
     && chown -R ${USER}:${USER} ${USER_HOME} \
     && cd /etc/ssh/ && ssh-keygen -A -N '' \
     # Config SSH Daemon \
-    && sed -i "s/#PasswordAuthentication.*/PasswordAuthentication no/g" /etc/ssh/sshd_config \
-    && sed -i "s/#PermitRootLogin.*/PermitRootLogin no/g" /etc/ssh/sshd_config \
-    && sed -i "s/#AuthorizedKeysFile/AuthorizedKeysFile/g" /etc/ssh/sshd_config \
     # Unlock non-password USER to enable SSH login \
     #&& passwd -u ${USER} \
-    # Set up user's public and private keys \
-    && mkdir -p ${SSHDIR} \
-    # Default ssh config file that skips (yes/no) question when first login to the host \
-    && echo "Host *" > ${SSHDIR}/config \
-    && echo "    StrictHostKeyChecking no" >> ${SSHDIR}/config \
-    && echo "    TCPKeepAlive yes" >> ${SSHDIR}/config \
-    && echo "    ServerAliveCountMax 6" >> ${SSHDIR}/config \
-    && echo "    ServerAliveInterval 30" >> ${SSHDIR}/config
 
 USER root
 
-COPY ssh ${SSHDIR}/
-
 ARG WORKDIR
-
-RUN cat ${SSHDIR}/*.pub >> ${SSHDIR}/authorized_keys \
-    && chmod -R 600 ${SSHDIR}/* \
-    && chown -R ${USER}:${USER} ${SSHDIR} \
-    && mkdir -p ${WORKDIR} \
-    && chown -R ${USER}:${USER} ${WORKDIR} \
-    && echo "cd ${WORKDIR}" >> ${USER_HOME}/.profile \
-    && chown ${USER}:${USER} ${USER_HOME}/.profile \
-    && cp -a ${USER_HOME}/.profile ${USER_HOME}/.bash_profile
 
 # Switch back to default user when continue the build process
 USER ${USER}
@@ -589,19 +566,10 @@ USER root
 
 # Remove the boost headers now that ngen is compiled; also update path and make sure dataset directory is there
 RUN rm -rf ${BOOST_ROOT} && echo "export PATH=${PATH}" >> /etc/profile \
-    && sed -i "s/PasswordAuthentication yes/#PasswordAuthentication yes/g" /etc/ssh/sshd_config \
-    && sed -i "s/PermitRootLogin yes/PermitRootLogin no/g" /etc/ssh/sshd_config \
-    && sed -i "s/#ClientAliveInterval.*/ClientAliveInterval 60/" /etc/ssh/sshd_config \
-    && sed -i "s/#ClientAliveCountMax.*/ClientAliveCountMax 5/" /etc/ssh/sshd_config \
-    && rm /var/run/nologin  \
     && mkdir -p /dmod/datasets && chown ${USER} /dmod/datasets \
     && mkdir -p /dmod/shared_libs && chown ${USER} /dmod/shared_libs \
     && mkdir -p /dmod/bin && chown ${USER} /dmod/bin 
 USER ${USER}
-
-#COPY --chown=${USER} entrypoint.sh ${WORKDIR}
-
-ENV HYDRA_PROXY_RETRY_COUNT=5
 
 # Change permissions for entrypoint and make sure dataset volume mount parent directories exists
 # chmod +x ${WORKDIR}/entrypoint.sh \
