@@ -236,6 +236,7 @@ USER ${USER}
 ##### Create intermediate Docker build stage for Rocky-Linux-based "ngen-deps"
 FROM rocky-ngen-packaged-deps as rocky-ngen-deps
 
+USER root
 ARG BOOST_VERSION
 ARG WORKDIR
 
@@ -269,10 +270,9 @@ COPY --from=download_netcdf /tmp/netcdf-${NETCDF_C_VERSION}.tar.gz /tmp/ngen-dep
 COPY --from=download_netcdf_cxx /tmp/netcdf-cxx4-${NETCDF_CXX_VERSION}.tar.gz /tmp/ngen-deps/netcdf-cxx4-${NETCDF_CXX_VERSION}.tar.gz
 COPY --from=download_netcdf_fortran /tmp/netcdf-fortran-${NETCDF_FORTRAN_VERSION}.tar.gz /tmp/ngen-deps/netcdf-fortran-${NETCDF_FORTRAN_VERSION}.tar.gz
 
-USER root
+RUN pip3 install --upgrade pip
 
 ENV HYDRA_HOST_FILE=/etc/opt/hosts
-
 # Hostfile location for mpirun. This file will be updated automatically.
 RUN echo "export HYDRA_HOST_FILE=${HYDRA_HOST_FILE}" >> /etc/profile \
     && touch ${HYDRA_HOST_FILE} \
