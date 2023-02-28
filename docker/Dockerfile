@@ -98,7 +98,6 @@ RUN dnf update -y \
     && adduser -p 'ignored' ${USER} \
     && echo "${USER}   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
     && chown -R ${USER}:${USER} ${USER_HOME} \
-    && cd /etc/ssh/ && ssh-keygen -A -N '' \
     # Config SSH Daemon \
     # Unlock non-password USER to enable SSH login \
     #&& passwd -u ${USER} \
