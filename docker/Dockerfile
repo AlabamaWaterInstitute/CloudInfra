@@ -96,7 +96,7 @@ RUN dnf update -y \
     && dnf -y install ${ROCKY_BASE_REQUIRED} \
     # Note that adduser -p expects an encrypted/hashed password, so it will ignore a simple password \
     && adduser -p 'ignored' ${USER} \
-    && echo "${USER}   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
+    && echo "${USER}   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers 
     # Config SSH Daemon \
     # Unlock non-password USER to enable SSH login \
     #&& passwd -u ${USER} \
