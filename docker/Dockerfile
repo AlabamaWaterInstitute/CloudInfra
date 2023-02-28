@@ -97,7 +97,6 @@ RUN dnf update -y \
     # Note that adduser -p expects an encrypted/hashed password, so it will ignore a simple password \
     && adduser -p 'ignored' ${USER} \
     && echo "${USER}   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
-    && chown -R ${USER}:${USER} ${USER_HOME} \
     # Config SSH Daemon \
     # Unlock non-password USER to enable SSH login \
     #&& passwd -u ${USER} \
@@ -277,7 +276,6 @@ ENV HYDRA_HOST_FILE=/etc/opt/hosts
 # Hostfile location for mpirun. This file will be updated automatically.
 RUN echo "export HYDRA_HOST_FILE=${HYDRA_HOST_FILE}" >> /etc/profile \
     && touch ${HYDRA_HOST_FILE} \
-    && chown ${USER}:${USER} ${HYDRA_HOST_FILE} \
     ################### Build and install dependencies from source ################### \
     ##### Prep temp build root directory \
     && mkdir -p /tmp/ngen-deps \
