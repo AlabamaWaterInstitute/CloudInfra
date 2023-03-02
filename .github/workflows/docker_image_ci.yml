@@ -4,11 +4,11 @@ on:
   push:
     branches: [ master ]
     paths:
-      - terraform/**
+      - docker/**
   pull_request:
     branches: [ master ]
     paths:
-      - terraform/**
+      - docker/**
 jobs:
 
   build:
