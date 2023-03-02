@@ -2,7 +2,8 @@ name: Build and Push Docker image to Docker Hub
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - 'branch-**'
     paths:
       - docker/**
   pull_request:

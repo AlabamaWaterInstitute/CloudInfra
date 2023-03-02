@@ -369,6 +369,7 @@ ARG WORKDIR
 
 WORKDIR ${WORKDIR}
 
+
 RUN cd ${WORKDIR} \
     && if [ "x$COMMIT" != "x" ]; then \
         git clone --single-branch --branch $BRANCH $REPO_URL \
