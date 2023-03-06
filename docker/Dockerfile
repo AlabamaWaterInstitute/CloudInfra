@@ -84,8 +84,7 @@ ARG BUILD_SLOTH="true"
 ##### Create intermediate Docker build stage for Rocky-Linux-based "base"
 FROM rockylinux:8.5 as rocky-base
 
-ARG USER=mpi
-ENV USER=${USER} USER_HOME=/home/${USER}
+#ARG USER=root
 
 ARG ROCKY_BASE_REQUIRED
 
@@ -93,20 +92,16 @@ RUN dnf update -y \
     && dnf install -y 'dnf-command(config-manager)' \
     && dnf config-manager --set-enabled powertools \
     && dnf install -y epel-release \
-    && dnf -y install ${ROCKY_BASE_REQUIRED} \
+    && dnf -y install ${ROCKY_BASE_REQUIRED} 
     # Note that adduser -p expects an encrypted/hashed password, so it will ignore a simple password \
-    && adduser -p 'ignored' ${USER} \
-    && echo "${USER}   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers 
     # Config SSH Daemon \
     # Unlock non-password USER to enable SSH login \
     #&& passwd -u ${USER} \
 
-USER root
 
-ARG WORKDIR
+ARG WORKDIR=/ngen
 
 # Switch back to default user when continue the build process
-USER ${USER}
 
 ################################################################################################################
 ################################################################################################################
@@ -121,7 +116,7 @@ RUN curl -L -o boost_${BOOST_VERSION//./_}.tar.bz2 https://sourceforge.net/proje
     && mv boost_${BOOST_VERSION//./_}.tar.bz2 /boost/.
 
 ################################################################################################################
-################################################################################################################
+##https://support.hdfgroup.org/ftp/HDF5/releases##############################################################################################################
 ##### Create intermediate Docker build stage for downloading MPICH
 FROM rockylinux:8.5 AS download_mpich
 
@@ -225,18 +220,18 @@ FROM rocky-base as rocky-ngen-packaged-deps
 ARG ROCKY_NGEN_DEPS_REQUIRED
 
 # Note that this includes numpy, which is needed for Python BMI support, regardless of BMI module 
-USER root
+#USER root
 RUN dnf update -y && dnf install -y ${ROCKY_NGEN_DEPS_REQUIRED} \
     && pip3 install --upgrade pip \
     && if [ "${NGEN_ACTIVATE_PYTHON}" == "ON" ]; then pip3 install numpy; fi
-USER ${USER}
+#USER ${USER}
 
 ################################################################################################################
 ################################################################################################################
 ##### Create intermediate Docker build stage for Rocky-Linux-based "ngen-deps"
 FROM rocky-ngen-packaged-deps as rocky-ngen-deps
 
-USER root
+#USER root
 ARG BOOST_VERSION
 ARG WORKDIR
 
@@ -271,6 +266,7 @@ COPY --from=download_netcdf_cxx /tmp/netcdf-cxx4-${NETCDF_CXX_VERSION}.tar.gz /t
 COPY --from=download_netcdf_fortran /tmp/netcdf-fortran-${NETCDF_FORTRAN_VERSION}.tar.gz /tmp/ngen-deps/netcdf-fortran-${NETCDF_FORTRAN_VERSION}.tar.gz
 
 RUN pip3 install --upgrade pip
+RUN pip3 install -t /ngen numpy pandas pyyaml bmipy Cython blosc2==2.0.0 netCDF4 wheel packaging opencv-contrib-python-headless
 
 ENV HYDRA_HOST_FILE=/etc/opt/hosts
 # Hostfile location for mpirun. This file will be updated automatically.
@@ -307,20 +303,22 @@ RUN echo "export HYDRA_HOST_FILE=${HYDRA_HOST_FILE}" >> /etc/profile \
     && cd netcdf-fortran \
     && export NCDIR=/usr NFDIR=/usr \
     && LD_LIBRARY_PATH=/usr/lib CPPFLAGS=-I/usr/include LDFLAGS=-L/usr/lib ./configure --prefix=/usr \
-    && make -j $(nproc) && make install \
-    ##### Build and install NetCDF C++ \
-    && cd /tmp/ngen-deps \
+    && make -j $(nproc) \ 
+    && make install
+    ##### Build and install NetCDF C++ 
+RUN cd /tmp/ngen-deps \
     && mkdir netcdf-cxx4 \
     && tar -xzf netcdf-cxx4-${NETCDF_CXX_VERSION}.tar.gz -C netcdf-cxx4 --strip 1 \
     && mkdir netcdf-cxx4/build \
     && cd netcdf-cxx4/build \
+    && ../configure --enable-parallel --prefix=/usr \
     && cmake .. \
     && make \
     # TODO: if we run into any problem, might need to reactivate this \
-    # && ctest \
+    #&& ctest \
     && make install \
     # Install required python dependency packages with Pip \
-    && pip3 install numpy pandas pyyaml bmipy Cython blosc2 netCDF4 wheel packaging \
+    && pip3 install numpy pandas pyyaml bmipy Cython blosc2==2.0.0 netCDF4 wheel packaging \
     && HDF5_DIR=/usr pip3 install --install-option="\'--hdf5 \${HDF5_DIR}\'" --install-option="\'--jobs=$(nproc) \'"  --no-build-isolation tables \
     # Make aliases for convenience \
     && alias pip='pip3' \
@@ -335,8 +333,6 @@ RUN echo "export HYDRA_HOST_FILE=${HYDRA_HOST_FILE}" >> /etc/profile \
 
 ENV PATH=${PATH}:/usr/lib64/mpich/bin
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib:/usr/local/lib64
-
-USER ${USER}
 
 ################################################################################################################
 ################################################################################################################
@@ -401,11 +397,9 @@ ARG BRANCH
 ARG COMMIT
 ARG BUILD_PARALLEL_JOBS
 
-COPY --chown=${USER} --from=rocky_init_troute_repo ${WORKDIR}/t-route ${WORKDIR}/t-route
+COPY --chown=root --from=rocky_init_troute_repo ${WORKDIR}/t-route ${WORKDIR}/t-route
 
-USER root
 RUN cp -s /usr/bin/python3 /usr/bin/python
-USER ${USER}
 
 #    && python(){ /usr/bin/python3 \$@; } && export -f python \
 RUN cd ${WORKDIR}/t-route \
@@ -427,9 +421,7 @@ RUN cd ${WORKDIR}/t-route \
     && python3 setup.py bdist_wheel \
     && cp dist/*.whl ${WORKDIR}/t-route/wheels/
 
-USER root
 RUN rm /usr/bin/python
-USER ${USER}
 
 ################################################################################################################
 ################################################################################################################
@@ -551,7 +543,7 @@ RUN cd ${WORKDIR}/ngen \
 
 ################################################################################################################
 ################################################################################################################
-##### Final stage for image
+##### Penultimate stage for image
 FROM rocky_build_ngen as rocky_build_staging
 
 ARG DATASET_DIRECTORIES
@@ -559,14 +551,12 @@ ARG DATASET_DIRECTORIES
 #RUN cd ./ngen && mkdir ${WORKDIR}/bin && cp cmake_build/ngen ${WORKDIR}/bin && cp -r data ${WORKDIR}/data \
 #    && cd $WORKDIR && rm -rf ngen boost
 
-USER root
 
 # Remove the boost headers now that ngen is compiled; also update path and make sure dataset directory is there
 RUN rm -rf ${BOOST_ROOT} && echo "export PATH=${PATH}" >> /etc/profile \
-    && mkdir -p /dmod/datasets && chown ${USER} /dmod/datasets \
-    && mkdir -p /dmod/shared_libs && chown ${USER} /dmod/shared_libs \
-    && mkdir -p /dmod/bin && chown ${USER} /dmod/bin 
-USER ${USER}
+    && mkdir -p /dmod/datasets && chown root /dmod/datasets \
+    && mkdir -p /dmod/shared_libs && chown root /dmod/shared_libs \
+    && mkdir -p /dmod/bin && chown root /dmod/bin 
 
 # Change permissions for entrypoint and make sure dataset volume mount parent directories exists
 # chmod +x ${WORKDIR}/entrypoint.sh \
@@ -591,13 +581,11 @@ ENV PATH=${WORKDIR}:$PATH
 ##### Final stage for image
 FROM rockylinux:8.6-minimal
 
-#RUN dnf update -y && dnf upgrade -y
 ########################################Copy over the NGEN artifacts############################################
 COPY --chown=root --from=rocky_build_staging /dmod/ /dmod/
 COPY --chown=root --from=rocky_build_staging /ngen/ngen/data/ /ngen/ngen/data/
 COPY --chown=root --from=rocky_build_staging /ngen/ngen/extern/ /ngen/ngen/extern/
 #COPY --chown=root --from=rocky_build_staging /usr/lib64/ /usr/lib64/
-COPY --chown=root --from=rocky_build_staging /usr/local/lib64/ /usr/local/lib64/
 COPY --chown=root --from=rocky_build_staging /usr/ /usr/
 ########################################Relink the files########################################################
 RUN ldconfig -v
@@ -607,8 +595,6 @@ RUN chown -R root /dmod /ngen /root
 RUN chmod a+x /dmod/bin/* /ngen/HelloNGEN.sh /root
 RUN rm -rf tmp var opt 
 WORKDIR /ngen
-
-#RUN dnf install -y glibc bash
 
 ENTRYPOINT ["./HelloNGEN.sh"]
 CMD [""]
