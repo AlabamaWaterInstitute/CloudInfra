@@ -27,3 +27,6 @@ override.tf.json
 
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
+
+# Adding the .github so that who ever forks this repository, they will not get the original github actions files.
+.github/workflows
