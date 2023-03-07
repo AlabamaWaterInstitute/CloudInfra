@@ -3,14 +3,16 @@
 This Terraform configuration is used to build and manage resources on the CIROH cloud, including an EC2 instance running a containerized model.
 
 ## Docker Build
+
 To build the Dockerfile, run the following command:
 ```bash
 docker buildx build -f /docker/Dockerfile --platform=linux/amd64 -t $CONTAINER_NAME .
 ```
+This is now done by Github Actions automatically, on push to main branch or when Pull Request is created to a branch - `main`.
 
 ## Terraform validate
 
-- GitHub Actions will run Terraform validation every time a push or pull request is made to a branch - `main` and includes changes to the Terraform files in the terraform directory.
+- GitHub Actions will run Terraform init and validate every time a push or pull request is made to a branch - `main`.
 
 ** Note that the terraform init command is also included in the workflow. This command initializes the Terraform working directory and downloads the necessary providers and modules. It is required before running terraform validate to ensure that all dependencies are available.
 
