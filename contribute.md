@@ -3,6 +3,11 @@
 Thank you for considering contributing to our project! We welcome contributions from everyone, and we want to make the process as easy and transparent as possible
   
 
+## Issue Tracking  
+
+Please check our [issue tracker](https://github.com/AlabamaWaterInstitute/CloudInfra/issues) for existing issues that you can work on. If you find a new issue or have a feature request, please open a new issue so we can discuss it and prioritize it accordingly.
+
+
 ## How to Contribute
 
 
@@ -18,7 +23,3 @@ Thank you for considering contributing to our project! We welcome contributions 
 
 6. Once your pull request is submitted, it will be reviewed by the maintainers. You may be asked to make further changes before your contribution can be merged.
 
-## Issue Tracking
-  
-
-Please check our [issue tracker](https://github.com/AlabamaWaterInstitute/CloudInfra/issues) for existing issues that you can work on. If you find a new issue or have a feature request, please open a new issue so we can discuss it and prioritize it accordingly.
