@@ -1,23 +1,24 @@
-Working with GitHub as a contributor to someone's repository typically involves the following best practices process flow:
+# Contributing Guidelines
 
-Fork the repository: Before making any changes, fork the repository of the owner to create a copy of the repository that you can work with.
+Thank you for considering contributing to our project! We welcome contributions from everyone, and we want to make the process as easy and transparent as possible
+  
 
-Clone the repository: Clone the forked repository to your local machine using the git clone command.
+## How to Contribute
 
-Create a branch: Create a new branch to make your changes in. This helps you keep your changes separate from the main branch.
 
-Make changes: Make the necessary changes to the files in your branch. Ensure that your changes align with the guidelines and rules of the repository owner.
+1. Fork the repository and clone it to your local machine.
 
-Commit changes: Once you have made the changes, commit them with a descriptive commit message. This helps the repository owner understand the changes that you made.
+2. Create a new branch for your changes using the format "feature/<feature-name>" or "bugfix/<bug-name>".
 
-Push changes: Push the changes to your forked repository using the git push command.
+3. Make your changes and commit them with clear and concise commit messages.
 
-Create a pull request: Once you have pushed your changes to your forked repository, create a pull request to the repository owner's original repository. Be sure to include a clear description of the changes and why they are important.
+4. Push your changes to your forked repository.
 
-Discuss the changes: The repository owner may review your changes and ask you questions or request changes. Be open to feedback and respond promptly.
+5. Open a pull request from your forked repository to our repository with a clear and descriptive title and detailed description of your changes.
 
-Merge changes: If the repository owner approves your changes, they will merge them into the main branch of their repository. Congratulations, you've contributed to someone else's repository!
+6. Once your pull request is submitted, it will be reviewed by the maintainers. You may be asked to make further changes before your contribution can be merged.
 
-Update your forked repository: After the changes are merged, update your forked repository with the new changes using the git pull command. This ensures that your local repository is up to date with the owner's repository.
+## Issue Tracking
+  
 
-These best practices can help ensure a smooth and efficient process for contributing to someone else's GitHub repository.
+Please check our [issue tracker](https://github.com/AlabamaWaterInstitute/CloudInfra/issues) for existing issues that you can work on. If you find a new issue or have a feature request, please open a new issue so we can discuss it and prioritize it accordingly.
