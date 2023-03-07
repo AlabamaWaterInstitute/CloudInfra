@@ -40,8 +40,9 @@ select opt in ngen-parallel ngen-serial quit; do
       echo "Copy and paste it into the terminal to run your model."
       break
       ;;
-    quit)
-      break
+    bash)
+      echo "Starting a shell, simply exit to stop the process."
+      /bin/bash
       ;;
     *) 
       echo "Invalid option $REPLY"
