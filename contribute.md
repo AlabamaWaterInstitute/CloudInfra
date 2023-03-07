@@ -8,7 +8,7 @@ Thank you for considering contributing to our project! We welcome contributions 
 
 1. Fork the repository and clone it to your local machine.
 
-2. Create a new branch for your changes using the format "feature/<feature-name>" or "bugfix/<bug-name>".
+2. Create a new branch for your changes using the format "feature/`<feature-name>`" or "bugfix/`<bug-name>`".
 
 3. Make your changes and commit them with clear and concise commit messages.
 
