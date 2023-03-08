@@ -11,7 +11,7 @@ echo -e "\e[4mFound these Catchment files:\e[0m" && sleep 1 && echo "$HYDRO_FABR
 echo -e "\e[4mFound these Nexus files:\e[0m" && sleep 1 && echo "$HYDRO_FABRIC_NEXUS"
 echo -e "\e[4mFound these Realization files:\e[0m" && sleep 1 && echo "$NGEN_REALIZATIONS"
 
-select opt in ngen-parallel ngen-serial quit; do
+select opt in ngen-parallel ngen-serial bash; do
 
   case $opt in
     ngen-parallel)
@@ -40,8 +40,9 @@ select opt in ngen-parallel ngen-serial quit; do
       echo "Copy and paste it into the terminal to run your model."
       break
       ;;
-    quit)
-      break
+    bash)
+      echo "Starting a shell, simply exit to stop the process."
+      /bin/bash
       ;;
     *) 
       echo "Invalid option $REPLY"
