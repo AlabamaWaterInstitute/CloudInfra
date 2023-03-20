@@ -18,17 +18,17 @@ Provide a brief description of the project and its goals. This can help the infr
 Specify the compute, storage, and network resources needed for the project. Be as specific as possible about the number of resources required, and any specific configurations or capabilities needed. This information will help the infrastructure team determine the appropriate resources to allocate.
 
 **Options:**
-•	EC2
-•	S3 – public, private, requester pay, bucket name suggestion?
-•	EBS (Amazon Elastic Block Store)
-•	EFS
-•	RDS
-•	VPC (Virtual Private Cloud)
-•	DynamoDB
-•	ECS
-•	EKS (Kubernetes Cluster)
-•	Lambda
-•	Others: please list
+- EC2
+- S3 – public, private, requester pay, bucket name suggestion?
+- EBS (Amazon Elastic Block Store)
+- EFS
+- RDS
+- VPC (Virtual Private Cloud)
+- DynamoDB
+- ECS
+- EKS (Kubernetes Cluster)
+- Lambda
+- Others: please list
  
 **4.	Timeline:** 
 Indicate the expected timeline for the project and when the resources will be needed. This information can help the infrastructure team plan and allocate resources accordingly.
