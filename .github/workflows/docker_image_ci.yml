@@ -15,11 +15,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Login to Docker Hub
-      env:
-        DOCKER_USER: ${{secrets.DOCKER_USER}}
-        DOCKER_PASSWORD: ${{secrets.DOCKER_AUTH_TOKEN}}
       run: |
-        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD      
+          echo "${{ secrets.DOCKER_AUTH_TOKEN }}" | docker login --username awiciroh --password-stdin     
     - name: Build and tag Docker image
       run: docker build -t awiciroh/ciroh-ngen-image:${{ github.sha }} docker/.      
     - name: Push Docker image
