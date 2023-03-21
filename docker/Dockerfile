@@ -82,7 +82,7 @@ ARG BUILD_SLOTH="true"
 ################################################################################################################
 ################################################################################################################
 ##### Create intermediate Docker build stage for Rocky-Linux-based "base"
-FROM rockylinux:8.5 as rocky-base
+FROM rockylinux:9.1 as rocky-base
 
 #ARG USER=root
 
@@ -106,7 +106,7 @@ ARG WORKDIR=/ngen
 ################################################################################################################
 ################################################################################################################
 ##### Create intermediate Docker build stage for downloading Boost
-FROM rockylinux:8.5 AS download_boost
+FROM rockylinux:9.1 AS download_boost
 
 # Redeclaring inside this stage to get default from before first FROM
 ARG BOOST_VERSION
@@ -118,7 +118,7 @@ RUN curl -L -o boost_${BOOST_VERSION//./_}.tar.bz2 https://sourceforge.net/proje
 ################################################################################################################
 ##https://support.hdfgroup.org/ftp/HDF5/releases##############################################################################################################
 ##### Create intermediate Docker build stage for downloading MPICH
-FROM rockylinux:8.5 AS download_mpich
+FROM rockylinux:9.1 AS download_mpich
 
 # Redeclaring inside this stage to get default from before first FROM
 ARG MPICH_VERSION
@@ -129,7 +129,7 @@ RUN curl -o /tmp/mpich-${MPICH_VERSION}.tar.gz https://www.mpich.org/static/down
 ################################################################################################################
 ################################################################################################################
 ##### Create intermediate Docker build stage for downloading MPICH
-FROM rockylinux:8.5 AS download_hd5
+FROM rockylinux:9.1 AS download_hd5
 
 # Redeclaring inside this stage to get default from before first FROM
 ARG HD5_VERSION
@@ -579,7 +579,7 @@ ENV PATH=${WORKDIR}:$PATH
 
 ################################################################################################################
 ##### Final stage for image
-FROM rockylinux:8.6-minimal
+FROM rockylinux:9.1-minimal
 
 ########################################Copy over the NGEN artifacts############################################
 COPY --chown=root --from=rocky_build_staging /dmod/ /dmod/
