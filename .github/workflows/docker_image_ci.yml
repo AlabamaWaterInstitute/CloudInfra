@@ -18,6 +18,8 @@ jobs:
       run: |
           echo "${{ secrets.DOCKER_AUTH_TOKEN }}" | docker login --username awiciroh --password-stdin     
     - name: Build and tag Docker image
-      run: docker build -t awiciroh/ciroh-ngen-image:${{ github.sha }} docker/.      
+      run: docker build -t awiciroh/ciroh-ngen-image:${{ github.sha }} -t awiciroh/ciroh-ngen-image:latest docker/.      
     - name: Push Docker image
-      run: docker push awiciroh/ciroh-ngen-image:${{ github.sha }}
+      run: |
+        docker push awiciroh/ciroh-ngen-image:${{ github.sha }} 
+        docker push awiciroh/ciroh-ngen-image:latest
