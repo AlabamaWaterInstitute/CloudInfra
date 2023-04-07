@@ -1,7 +1,13 @@
 name: deploy
 
+inputs:
+  version:
+    description: 'The version of the Docker image'
+    required: true
+
 runs:
   using: "composite"
+  shell: bash
   steps:
     - name: Checkout code
       uses: actions/checkout@v2
