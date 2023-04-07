@@ -5,6 +5,8 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
+      - name: deploy
+        uses: actions/checkout@v2
       - name: Build and push Docker image
         uses: ./.github/action_templates/build-and-push
         with:
