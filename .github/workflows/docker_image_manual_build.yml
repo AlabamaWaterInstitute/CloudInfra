@@ -5,7 +5,9 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-    - name: deploy
-      uses: "./.github/action_templates/action.yaml"
-      with: 
-        version: v1
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: deploy
+        uses: "../action_templates/action.yaml"
+        with: 
+          version: v1
