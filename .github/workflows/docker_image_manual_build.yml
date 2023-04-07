@@ -7,5 +7,3 @@ jobs:
     steps:
       - name: deploy
         uses: AlabamaWaterInstitute/CloudInfra@main:.github/action_templates/action.yaml
-        with: 
-          version: v1
