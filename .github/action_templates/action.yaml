@@ -1,9 +1,5 @@
 name: deploy
 
-inputs:
-  version:
-    required: true
-
 runs:
   using: "composite"
   steps:
