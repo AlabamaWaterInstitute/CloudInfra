@@ -6,4 +6,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: deploy
-        uses: AlabamaWaterInstitute/CloudInfra@main:.github/action_templates/action.yaml
+        uses: ./.github/action_templates
