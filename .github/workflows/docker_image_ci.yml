@@ -1,14 +1,13 @@
 name: Build and Push Docker image to Docker Hub
 on:
-  workflow_dispatch:
-#  push:
-#    branches: [ main ]
-#    paths:
-#      - docker/**
-#  pull_request:
-#    branches: [ main ]
-#    paths:
-#      - docker/**
+  push:
+    branches: [ main ]
+    paths:
+      - docker/**
+  pull_request:
+    branches: [ main ]
+    paths:
+      - docker/**
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
