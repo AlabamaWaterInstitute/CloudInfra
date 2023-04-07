@@ -8,6 +8,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: deploy
-        uses: "../action_templates/action.yaml"
+        uses: AlabamaWaterInstitute/CloudInfra@main
         with: 
           version: v1
