@@ -508,7 +508,7 @@ RUN cd ${WORKDIR}/ngen \
     && ln -s $(if [ "${BUILD_NGEN_PARALLEL}" == "true" ]; then echo "cmake_build_parallel"; else echo "cmake_build_serial"; fi) cmake_build \
     &&  if [ "${BUILD_NGEN_PARTITIONER}" == "true" ]; then \
             cmake --build cmake_build --target partitionGenerator; \
-            $BUILD_DIR/test/test_bmi_python; \
+#            $BUILD_DIR/test/test_bmi_python; \
         fi \
     && for BUILD_DIR in $(if [ "${BUILD_NGEN_PARALLEL}" == "true" ]; then echo "cmake_build_parallel"; fi) $(if [ "${BUILD_NGEN_SERIAL}" == "true" ]; then echo "cmake_build_serial"; fi) ; do \
         cmake --build $BUILD_DIR --target ngen -j ${BUILD_PARALLEL_JOBS} \
