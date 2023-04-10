@@ -590,6 +590,7 @@ COPY --chown=root --from=rocky_build_staging /usr/ /usr/
 ########################################Relink the files########################################################
 RUN ldconfig -v
 
+########################################Copy HelloNGEN.sh########################################################
 COPY   HelloNGEN.sh /ngen/HelloNGEN.sh
 RUN chown -R root /dmod /ngen /root
 RUN chmod a+x /dmod/bin/* /ngen/HelloNGEN.sh /root
