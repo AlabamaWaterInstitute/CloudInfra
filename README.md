@@ -18,7 +18,9 @@ This is now done by Github Actions automatically, on push to main branch or when
 
 ## Terraform Usage
 
-To run the Terraform configuration, follow these steps:
+** Note that terraform configuration in network directory will setup initial VPC and subnets, only runs once by administrator.
+To run the Terraform configuration as a user, follow these steps in user directory under terraform:
+As a pre-requisite step, create a key-pair in AWS EC2 console, and place the key in user directory.
 
 1. Generate a plan file by running terraform plan -o plan.file.
 2. Apply the plan file by running terraform apply plan.file and fill out the Terraform variables.
@@ -53,8 +55,6 @@ The following variables can be customized:
 `allowed_ssh_cidr`: Public IP address/range allowed for SSH access.
 
 `bucket_name`: S3 Bucket Name for AWS bucket to mount (at /mnt) for data.
-
-`public_key`: Contents of the SSH public key to be used for authentication.
 
 `managed_policies`: The attached IAM policies granting machine permissions. Default value is ["arn:aws:iam::aws:policy/AmazonEC2FullAccess", "arn:aws:iam::aws:policy/AmazonS3FullAccess", "arn:aws:iam::aws:policy/AmazonFSxFullAccess"].
 
