@@ -40,12 +40,14 @@ ARG ROCKY_BASE_REQUIRED="sudo bash git"
 #    bzip2 expat expat-devel flex bison udunits2 udunits2-devel"
 
 ARG ROCKY_NGEN_DEPS_REQUIRED="sudo gcc gcc-c++ make cmake tar git gcc-gfortran libgfortran \
-    python39 python39-devel python39-pip \
+    python3 python3-devel python3-pip \
     bzip2 expat expat-devel flex bison udunits2 udunits2-devel zlib-devel"
 # TODO: removed texinfo from list because it couldn't be found; make sure this doesn't lead to issues
 
 ARG BOOST_VERSION=1.72.0
-ARG MPICH_VERSION="3.2"
+#TODO Try mpich 4.x for native arm build support (https://raw.githubusercontent.com/pmodels/mpich/v4.1.1/CHANGES)
+#mpich 3.2 doesn't work well gfortran 11 it seems, an alignment error crops up, but 3.3.2 seems to work...
+ARG MPICH_VERSION="3.3.2"
 ARG MIN_PYTHON="3.8.0"
 ARG MIN_NUMPY="1.18.0"
 
@@ -82,7 +84,7 @@ ARG BUILD_SLOTH="true"
 ################################################################################################################
 ################################################################################################################
 ##### Create intermediate Docker build stage for Rocky-Linux-based "base"
-FROM rockylinux:8.5 as rocky-base
+FROM rockylinux:9.1 as rocky-base
 
 #ARG USER=root
 
@@ -90,7 +92,7 @@ ARG ROCKY_BASE_REQUIRED
 
 RUN dnf update -y \
     && dnf install -y 'dnf-command(config-manager)' \
-    && dnf config-manager --set-enabled powertools \
+    && dnf config-manager --set-enabled crb \
     && dnf install -y epel-release \
     && dnf -y install ${ROCKY_BASE_REQUIRED} 
     # Note that adduser -p expects an encrypted/hashed password, so it will ignore a simple password \
@@ -106,7 +108,7 @@ ARG WORKDIR=/ngen
 ################################################################################################################
 ################################################################################################################
 ##### Create intermediate Docker build stage for downloading Boost
-FROM rockylinux:8.5 AS download_boost
+FROM rockylinux:9.1 AS download_boost
 
 # Redeclaring inside this stage to get default from before first FROM
 ARG BOOST_VERSION
@@ -118,7 +120,7 @@ RUN curl -L -o boost_${BOOST_VERSION//./_}.tar.bz2 https://sourceforge.net/proje
 ################################################################################################################
 ##https://support.hdfgroup.org/ftp/HDF5/releases##############################################################################################################
 ##### Create intermediate Docker build stage for downloading MPICH
-FROM rockylinux:8.5 AS download_mpich
+FROM rockylinux:9.1 AS download_mpich
 
 # Redeclaring inside this stage to get default from before first FROM
 ARG MPICH_VERSION
@@ -129,7 +131,7 @@ RUN curl -o /tmp/mpich-${MPICH_VERSION}.tar.gz https://www.mpich.org/static/down
 ################################################################################################################
 ################################################################################################################
 ##### Create intermediate Docker build stage for downloading MPICH
-FROM rockylinux:8.5 AS download_hd5
+FROM rockylinux:9.1 AS download_hd5
 
 # Redeclaring inside this stage to get default from before first FROM
 ARG HD5_VERSION
@@ -279,7 +281,8 @@ RUN echo "export HYDRA_HOST_FILE=${HYDRA_HOST_FILE}" >> /etc/profile \
     && cd /tmp/ngen-deps \
     && tar xfz mpich-${MPICH_VERSION}.tar.gz  \
     && cd mpich-${MPICH_VERSION} \
-    && ./configure ${MPICH_CONFIGURE_OPTIONS} \
+    # mpich3 and gfortran > 10 don't get along...https://gcc.gnu.org/bugzilla/show_bug.cgi?id=91731
+    && FFLAGS="-w -fallow-argument-mismatch -O2" ./configure ${MPICH_CONFIGURE_OPTIONS} \
     && make -j $(nproc) ${MPICH_MAKE_OPTIONS} && make install \
     ##### Build and install HDF5 \
     && cd /tmp/ngen-deps \
@@ -579,7 +582,7 @@ ENV PATH=${WORKDIR}:$PATH
 
 ################################################################################################################
 ##### Final stage for image
-FROM rockylinux:8.6-minimal
+FROM rockylinux:9.1-minimal
 
 ########################################Copy over the NGEN artifacts############################################
 COPY --chown=root --from=rocky_build_staging /dmod/ /dmod/
