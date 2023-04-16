@@ -475,6 +475,27 @@ RUN if [ "${NGEN_ACTIVATE_PYTHON}" == "ON" ]; then \
     fi
 USER ${USER}
 
+#These patches are from ngen commit 7551590a415b89026559c1c570d4154e4746161b
+#and are needed to fix an I/O bug in the sub modules (and bmi tests) that cause an infinite loop
+#the fix_tests patch cleans up some path handling to allow ctest to run automatically and detect
+#and run all tests (822 in serial, 828 in parallel -- some of which are duplicated)
+#Once these patches are applied upstream, this can be removed.
+COPY fix_tests_7551590a415b89026559c1c570d4154e4746161b.patch ${WORKDIR}/ngen/fix_tests.patch
+COPY fix_io_sub_7551590a415b89026559c1c570d4154e4746161b.patch ${WORKDIR}/ngen/fix_io_sub.patch
+# FIXME once these patches are all identified with issues/PR's upstream, drop some links in here
+# Apply the IO fix to submodules, once they all get patched/merged, this can be dropped...
+RUN cd ${WORKDIR}/ngen && git apply --reject --whitespace=fix \
+    # --exclude=extern/SoilFreezeThaw/forcing_code/src/bmi_aorc.c \
+    # --exclude=extern/SoilFreezeThaw/forcing_code/src/bmi_pet.c \
+    # --exclude=extern/cfe/forcing_code/src/bmi_aorc.c \
+    # --exclude=extern/cfe/forcing_code/src/bmi_pet.c \
+    # --exclude=extern/cfe/src/bmi_cfe.c \
+    # --exclude=extern/evapotranspiration/forcing_code/src/bmi_aorc.c \
+    # --exclude=extern/evapotranspiration/src/bmi_pet.c \
+    fix_io_sub.patch && \
+    #apply the patch to the main code
+    git apply --reject --whitespace=fix fix_tests.patch
+
 RUN cd ${WORKDIR}/ngen \
     && if [ "${NGEN_ACTIVATE_PYTHON}" == "ON" ]; then \
         pip3 install -r extern/test_bmi_py/requirements.txt; \
