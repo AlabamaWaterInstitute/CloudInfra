@@ -25,7 +25,7 @@ ARG COMMIT
 ARG WORKDIR=/ngen
 
 ARG TROUTE_REPO_URL=https://github.com/NOAA-OWP/t-route.git
-ARG TROUTE_BRANCH=ngen
+ARG TROUTE_BRANCH=master
 ARG TROUTE_COMMIT
 
 #### Default arguments for required dependencies needed during various build stages
@@ -40,7 +40,7 @@ ARG ROCKY_BASE_REQUIRED="sudo bash git"
 #    bzip2 expat expat-devel flex bison udunits2 udunits2-devel"
 
 ARG ROCKY_NGEN_DEPS_REQUIRED="sudo gcc gcc-c++ make cmake tar git gcc-gfortran libgfortran \
-    python3 python3-devel python3-pip \
+    python3 python3-devel python3-pip gdal gdal-devel\
     bzip2 expat expat-devel flex bison udunits2 udunits2-devel zlib-devel"
 # TODO: removed texinfo from list because it couldn't be found; make sure this doesn't lead to issues
 
@@ -321,8 +321,15 @@ RUN cd /tmp/ngen-deps \
     #&& ctest \
     && make install \
     # Install required python dependency packages with Pip \
-    && pip3 install numpy pandas pyyaml bmipy Cython blosc2==2.0.0 netCDF4 wheel packaging \
-    && HDF5_DIR=/usr pip3 install --install-option="\'--hdf5 \${HDF5_DIR}\'" --install-option="\'--jobs=$(nproc) \'"  --no-build-isolation tables \
+    # Except blosc2, since packaged wheels on pypi seem to have some issues, build it ourselves
+    && git clone https://github.com/Blosc/python-blosc2/ \
+    && cd python-blosc2 \
+    && git submodule update --init --recursive \
+    # TODO can checkout a particular tag -- as is you end up wtih a dev version, but it seems to work
+    && python3 -m pip install -r requirements-build.txt \
+    && pip3 install . \
+    && pip3 install numpy pandas pyyaml bmipy Cython netCDF4 wheel packaging \
+    && HDF5_DIR=/usr pip3 install -v --install-option="\'--hdf5 \${HDF5_DIR}\'" --install-option="\'--jobs=$(nproc) \'"  --no-build-isolation tables \
     # Make aliases for convenience \
     && alias pip='pip3' \
     && echo "alias pip='pip3'" >> /etc/profile \
@@ -408,21 +415,19 @@ RUN cp -s /usr/bin/python3 /usr/bin/python
 RUN cd ${WORKDIR}/t-route \
     && mkdir wheels \
     && pip3 install -r ./requirements.txt \
-    && pip3 install wheel deprecated dask \
+    && pip3 install wheel deprecated dask pyarrow geopandas
+    RUN export FC=gfortran NETCDF=/usr/include \
     && cd ${WORKDIR}/t-route \
-    && cd ./src/python_routing_v02 \
     && ./compiler.sh \
-    && python3 setup.py bdist_wheel \
+    && cd ./src/troute-network \
+    && python3 setup.py --use-cython bdist_wheel \
     && cp dist/*.whl ${WORKDIR}/t-route/wheels/ \
-    && cd ../python_framework_v02 \
-    && python3 setup.py bdist_wheel \
+    && cd ../troute-routing \
+    && python3 setup.py --use-cython bdist_wheel \
     && cp dist/*.whl ${WORKDIR}/t-route/wheels/ \
-    && cd ../nwm_routing \
+    && cd ../troute-nwm \
     && python3 setup.py bdist_wheel \
-    && cp dist/*.whl ${WORKDIR}/t-route/wheels/ \
-    && cd ../ngen_routing \
-    && python3 setup.py bdist_wheel \
-    && cp dist/*.whl ${WORKDIR}/t-route/wheels/
+    && cp dist/*.whl ${WORKDIR}/t-route/wheels/ 
 
 RUN rm /usr/bin/python
 
@@ -459,11 +464,24 @@ COPY --chown=${USER} --from=rocky_build_troute ${WORKDIR}/t-route/wheels /tmp/t-
 COPY --chown=${USER} --from=rocky_build_troute ${WORKDIR}/t-route/requirements.txt /tmp/t-route-requirements.txt
 ENV BOOST_ROOT=${WORKDIR}/boost
 
+USER root
+RUN if [ "${NGEN_ACTIVATE_PYTHON}" == "ON" ]; then \
+        chgrp -R ${USER} /usr/local/lib*/python3.* ; \
+        chmod -R g+sw /usr/local/lib*/python3.* ; \
+    fi \
+    && if [ "${NGEN_ROUTING_ACTIVE}" == "ON" ]; then \
+        # These packages install command line tools, which try to go in /usr/local/bin \
+        pip3 install pyarrow pyproj fiona; \
+    fi
+USER ${USER}
+
 RUN cd ${WORKDIR}/ngen \
     && if [ "${NGEN_ACTIVATE_PYTHON}" == "ON" ]; then \
         pip3 install -r extern/test_bmi_py/requirements.txt; \
         if [ "${NGEN_ROUTING_ACTIVE}" == "ON" ] ; then \
-            pip3 install /tmp/t-route-wheels/*.whl; pip3 install -r /tmp/t-route-requirements.txt; \
+            pip3 install /tmp/t-route-wheels/*.whl; \
+            pip3 install -r /tmp/t-route-requirements.txt; \
+            pip3 install deprecated geopandas ; \
             fi; \
         fi \
     &&  if [ "${NGEN_ACTIVATE_FORTRAN}" == "ON" ]; then \
