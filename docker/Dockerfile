@@ -548,39 +548,31 @@ RUN cd ${WORKDIR}/ngen \
         -DNETCDF_CXX_LIBRARY=/usr/local/lib64/libnetcdf-cxx4.so ; \
     fi \
     && ln -s $(if [ "${BUILD_NGEN_PARALLEL}" == "true" ]; then echo "cmake_build_parallel"; else echo "cmake_build_serial"; fi) cmake_build \
-    &&  if [ "${BUILD_NGEN_PARTITIONER}" == "true" ]; then \
-            cmake --build cmake_build --target partitionGenerator; \
-#            $BUILD_DIR/test/test_bmi_python; \
+    # Build the required submodules/external libs needed for running the tests later \
+    # C++ functionality isn't separate, so always build the test_bmi_cpp shared lib (also needed for test_bmi_multi) \
+    && ./build_sub extern/test_bmi_cpp \
+    # For the external language BMI integrations, conditionally build the test packages/libraries and run tests \
+    &&  if [ "${NGEN_ACTIVATE_C}" == "ON" ]; then \
+            ./build_sub extern/test_bmi_c; \
+        fi \
+    &&  if [ "${NGEN_ACTIVATE_FORTRAN}" == "ON" ]; then \
+            ./build_sub extern/test_bmi_fortran; \
         fi \
     && for BUILD_DIR in $(if [ "${BUILD_NGEN_PARALLEL}" == "true" ]; then echo "cmake_build_parallel"; fi) $(if [ "${BUILD_NGEN_SERIAL}" == "true" ]; then echo "cmake_build_serial"; fi) ; do \
-        cmake --build $BUILD_DIR --target ngen -j ${BUILD_PARALLEL_JOBS} \
-        #Run the tests, if they fail, the image build fails \
-        && cmake --build $BUILD_DIR --target test_unit -j ${BUILD_PARALLEL_JOBS} \
-        && $BUILD_DIR/test/test_unit \
-        # C++ functionality isn't separate, so always build the test_bmi_cpp shared lib (also needed for test_bmi_multi) \
-        && ./build_sub extern/test_bmi_cpp \
-        && cmake --build $BUILD_DIR --target test_bmi_cpp \
-        && $BUILD_DIR/test/test_bmi_cpp \
-        # For the external language BMI integrations, conditionally build the test packages/libraries and run tests \
-        &&  if [ "${NGEN_ACTIVATE_C}" == "ON" ]; then \
-                ./build_sub extern/test_bmi_c; \
-                cmake --build $BUILD_DIR --target test_bmi_c; \
-                $BUILD_DIR/test/test_bmi_c; \
-            fi \
-        &&  if [ "${NGEN_ACTIVATE_FORTRAN}" == "ON" ]; then \
-                ./build_sub extern/test_bmi_fortran; \
-                cmake --build $BUILD_DIR --target test_bmi_fortran; \
-                $BUILD_DIR/test/test_bmi_fortran; \
-            fi \
-        &&  if [ "${NGEN_ACTIVATE_PYTHON}" == "ON" ]; then \
-                cmake --build $BUILD_DIR --target test_bmi_python; \
-                $BUILD_DIR/test/test_bmi_python; \
-            fi \
-        &&  if [ "${NGEN_ACTIVATE_C}" == "ON" ] && [ "${NGEN_ACTIVATE_FORTRAN}" == "ON" ] && [ "${NGEN_ACTIVATE_PYTHON}" == "ON" ]; then \
-                cmake --build $BUILD_DIR --target test_bmi_multi; \
-                $BUILD_DIR/test/test_bmi_multi; \
-            fi \
+        cmake --build $BUILD_DIR --target all -j ${BUILD_PARALLEL_JOBS}; \
     done \
+    # run the serial tests \
+    && cd ${WORKDIR}/ngen && cmake --build cmake_build_serial --target test \ 
+    # have to remove the output from the previous tests runs for routing test to be run again... \
+    && rm -f ./test/data/routing/*.parquet \
+    # run the parallel tests \
+    && cmake --build cmake_build_parallel --target test \
+    # clean these up again... \
+    && rm -f ./test/data/routing/*.parquet \
+    #Run the MPI tests manually, they don't play well with ctest and are skipped in the above tests \
+    && mpirun -n 2 cmake_build_parallel/test/test_remote_nexus \
+    && mpirun -n 3 cmake_build_parallel/test/test_remote_nexus \
+    && mpirun -n 4 cmake_build_parallel/test/test_remote_nexus \
     && find cmake_build* -type f -name "*" ! \( -name "*.so" -o -name "ngen" -o -name "partitionGenerator" \) -exec rm {} + 
 
 ################################################################################################################
