@@ -44,7 +44,7 @@ select opt in ngen-parallel ngen-serial bash quit; do
       echo "Starting a shell, simply exit to stop the process."
       /bin/bash
       ;;
-    bash)
+    quit)
       exit
       ;;
     *) 
