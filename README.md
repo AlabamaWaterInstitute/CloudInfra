@@ -18,8 +18,12 @@ This is now done by Github Actions automatically, on push to main branch or when
 
 ## Terraform Usage
 
-** Note that terraform configuration in network directory will setup initial VPC and subnets, only runs once by administrator.
-To run the Terraform configuration as a user, follow these steps in user directory under terraform:
+Directories under terraform
+
+`network`: This directory will setup initial VPC and subnets, only runs once by administrator.
+
+`user`: Follow steps below in this directory to run Terraform configuration as a user:
+
 As a pre-requisite step, create a key-pair in AWS EC2 console, and place the key in user directory.
 
 1. Generate a plan file by running terraform plan -o plan.file.
