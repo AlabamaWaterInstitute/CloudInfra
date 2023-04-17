@@ -329,7 +329,7 @@ RUN cd /tmp/ngen-deps \
     && python3 -m pip install -r requirements-build.txt \
     && pip3 install . \
     && pip3 install numpy pandas pyyaml bmipy Cython netCDF4 wheel packaging \
-    && HDF5_DIR=/usr pip3 install -v --install-option="\'--hdf5 \${HDF5_DIR}\'" --install-option="\'--jobs=$(nproc) \'"  --no-build-isolation tables \
+    && HDF5_DIR=/usr pip3 install -v --no-build-isolation tables \
     # Make aliases for convenience \
     && alias pip='pip3' \
     && echo "alias pip='pip3'" >> /etc/profile \
