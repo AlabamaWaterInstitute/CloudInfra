@@ -18,7 +18,7 @@ This is now done by Github Actions automatically, on push to main branch or when
 
 ## Terraform Usage
 
-Directories under terraform
+Directories under terraform:
 
 `network`: This directory will setup initial VPC and subnets, only runs once by administrator.
 
