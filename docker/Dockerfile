@@ -55,6 +55,7 @@ ARG NETCDF_C_VERSION=4.8.1
 ARG NETCDF_CXX_VERSION=4.3.1
 ARG NETCDF_FORTRAN_VERSION=4.6.0
 ARG HD5_VERSION=1.10.9
+ARG BLOSC2_VERSION=v2.2.0
 
 # Work around Fortran MPI issue
 ARG FCFLAGS="-w -fallow-argument-mismatch -O2"
@@ -307,9 +308,9 @@ RUN echo "export HYDRA_HOST_FILE=${HYDRA_HOST_FILE}" >> /etc/profile \
     && export NCDIR=/usr NFDIR=/usr \
     && LD_LIBRARY_PATH=/usr/lib CPPFLAGS=-I/usr/include LDFLAGS=-L/usr/lib ./configure --prefix=/usr \
     && make -j $(nproc) \ 
-    && make install
+    && make install \
     ##### Build and install NetCDF C++ 
-RUN cd /tmp/ngen-deps \
+    && cd /tmp/ngen-deps \
     && mkdir netcdf-cxx4 \
     && tar -xzf netcdf-cxx4-${NETCDF_CXX_VERSION}.tar.gz -C netcdf-cxx4 --strip 1 \
     && mkdir netcdf-cxx4/build \
@@ -322,10 +323,12 @@ RUN cd /tmp/ngen-deps \
     && make install \
     # Install required python dependency packages with Pip \
     # Except blosc2, since packaged wheels on pypi seem to have some issues, build it ourselves
+    && cd /tmp/ngen-deps \
     && git clone https://github.com/Blosc/python-blosc2/ \
     && cd python-blosc2 \
+    #checkout a release tag
+    && git checkout ${BLOSC2_VERSION} \ 
     && git submodule update --init --recursive \
-    # TODO can checkout a particular tag -- as is you end up wtih a dev version, but it seems to work
     && python3 -m pip install -r requirements-build.txt \
     && pip3 install . \
     && pip3 install numpy pandas pyyaml bmipy Cython netCDF4 wheel packaging \
