@@ -63,8 +63,6 @@ ARG FFLAGS="-w -fallow-argument-mismatch -O2"
 ARG MPICH_CONFIGURE_OPTIONS=""
 ARG MPICH_MAKE_OPTIONS
 
-ARG BUILD_PARALLEL_JOBS
-
 ARG NGEN_ACTIVATE_C="ON"
 ARG NGEN_ACTIVATE_FORTRAN="ON"
 ARG NGEN_ACTIVATE_PYTHON="ON"
@@ -408,7 +406,6 @@ FROM rocky-ngen-deps as rocky_build_troute
 ARG REPO_URL
 ARG BRANCH
 ARG COMMIT
-ARG BUILD_PARALLEL_JOBS
 
 COPY --chown=root --from=rocky_init_troute_repo ${WORKDIR}/t-route ${WORKDIR}/t-route
 
@@ -442,7 +439,6 @@ FROM rocky-ngen-deps as rocky_build_ngen
 ARG REPO_URL
 ARG BRANCH
 ARG COMMIT
-ARG BUILD_PARALLEL_JOBS
 
 ARG NGEN_BUILD_CONFIG_TYPE
 ARG NGEN_ACTIVATE_C
@@ -561,8 +557,8 @@ RUN cd ${WORKDIR}/ngen \
     &&  if [ "${NGEN_ACTIVATE_FORTRAN}" == "ON" ]; then \
             ./build_sub extern/test_bmi_fortran; \
         fi \
-    && for BUILD_DIR in $(if [ "${BUILD_NGEN_PARALLEL}" == "true" ]; then echo "cmake_build_parallel"; fi) $(if [ "${BUILD_NGEN_SERIAL}" == "true" ]; then echo "cmake_build_serial"; fi) ; do \
-        cmake --build $BUILD_DIR --target all -j ${BUILD_PARALLEL_JOBS}; \
+    &&  for BUILD_DIR in $(if [ "${BUILD_NGEN_PARALLEL}" == "true" ]; then echo "cmake_build_parallel"; fi) $(if [ "${BUILD_NGEN_SERIAL}" == "true" ]; then echo "cmake_build_serial"; fi) ; do \
+        cmake --build $BUILD_DIR --target all -j $(nproc); \
     done \
     # run the serial tests \
     && cd ${WORKDIR}/ngen && cmake --build cmake_build_serial --target test \ 
