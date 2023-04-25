@@ -267,7 +267,7 @@ COPY --from=download_netcdf_cxx /tmp/netcdf-cxx4-${NETCDF_CXX_VERSION}.tar.gz /t
 COPY --from=download_netcdf_fortran /tmp/netcdf-fortran-${NETCDF_FORTRAN_VERSION}.tar.gz /tmp/ngen-deps/netcdf-fortran-${NETCDF_FORTRAN_VERSION}.tar.gz
 
 RUN pip3 install --upgrade pip
-RUN pip3 install -t /ngen numpy pandas pyyaml bmipy Cython blosc2==2.0.0 netCDF4 wheel packaging opencv-contrib-python-headless
+RUN pip3 install -t /ngen numpy pandas pyyaml bmipy Cython netCDF4 wheel packaging opencv-contrib-python-headless
 
 ENV HYDRA_HOST_FILE=/etc/opt/hosts
 # Hostfile location for mpirun. This file will be updated automatically.
@@ -479,21 +479,22 @@ USER ${USER}
 #the fix_tests patch cleans up some path handling to allow ctest to run automatically and detect
 #and run all tests (822 in serial, 828 in parallel -- some of which are duplicated)
 #Once these patches are applied upstream, this can be removed.
+# can be removed when https://github.com/NOAA-OWP/ngen/pull/515 is merged upstream
 COPY fix_tests_7551590a415b89026559c1c570d4154e4746161b.patch ${WORKDIR}/ngen/fix_tests.patch
+# All the affected submodules have patched/merged, but ngen submodules have not been updated to the current HEAD
+# of all the submdoules, and that might prove difficult to do in the near future, but if that does happen,
+# then this can be removed at that point.
 COPY fix_io_sub_7551590a415b89026559c1c570d4154e4746161b.patch ${WORKDIR}/ngen/fix_io_sub.patch
+# Can be removed when https://github.com/NOAA-OWP/ngen/pull/518 is merged upstream
+COPY fix_dir_7551590a415b89026559c1c570d4154e4746161b.patch ${WORKDIR}/ngen/fix_dir.patch
 # FIXME once these patches are all identified with issues/PR's upstream, drop some links in here
 # Apply the IO fix to submodules, once they all get patched/merged, this can be dropped...
 RUN cd ${WORKDIR}/ngen && git apply --reject --whitespace=fix \
-    # --exclude=extern/SoilFreezeThaw/forcing_code/src/bmi_aorc.c \
-    # --exclude=extern/SoilFreezeThaw/forcing_code/src/bmi_pet.c \
-    # --exclude=extern/cfe/forcing_code/src/bmi_aorc.c \
-    # --exclude=extern/cfe/forcing_code/src/bmi_pet.c \
-    # --exclude=extern/cfe/src/bmi_cfe.c \
-    # --exclude=extern/evapotranspiration/forcing_code/src/bmi_aorc.c \
-    # --exclude=extern/evapotranspiration/src/bmi_pet.c \
+    #patch the submodules
     fix_io_sub.patch && \
-    #apply the patch to the main code
-    git apply --reject --whitespace=fix fix_tests.patch
+    #patch ngen
+    git apply --reject --whitespace=fix fix_tests.patch && \
+    git apply --reject --whitespace=fix fix_dir.patch
 
 RUN cd ${WORKDIR}/ngen \
     && if [ "${NGEN_ACTIVATE_PYTHON}" == "ON" ]; then \
