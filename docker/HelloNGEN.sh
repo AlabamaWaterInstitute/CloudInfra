@@ -11,6 +11,13 @@ echo -e "\e[4mFound these Catchment files:\e[0m" && sleep 1 && echo "$HYDRO_FABR
 echo -e "\e[4mFound these Nexus files:\e[0m" && sleep 1 && echo "$HYDRO_FABRIC_NEXUS"
 echo -e "\e[4mFound these Realization files:\e[0m" && sleep 1 && echo "$NGEN_REALIZATIONS"
 
+generate_partition () {
+  # $1 catchment json file
+  # $2 nexus json file
+  # $3 number of partitions
+  /dmod/bin/partitionGenerator $1 $2 partitions_$3.json $3 '' ''
+}
+
 select opt in ngen-parallel ngen-serial bash quit; do
 
   case $opt in
@@ -21,9 +28,12 @@ select opt in ngen-parallel ngen-serial bash quit; do
       echo "$n2 selected"
       read -p "Enter the Realization file path: " n3
       echo "$n3 selected"
+      procs=$(nproc)
+      procs=2 #for now, just make this 2...
+      generate_partition $n1 $n2 $procs
       echo ""
       echo ""
-      echo "Your NGEN run command is $opt $n1 \"\" $n2 \"\" $n3"
+      echo "Your NGEN run command is mpirun -n $procs /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3 $(pwd)/partitions_$procs.json"
       echo "Copy and paste it into the terminal to run your model."
       break
       ;;
@@ -57,7 +67,15 @@ echo "If your model didn't run, or encountered an error, try checking the Forcin
 echo ""
 echo "Your model run is beginning!"
 echo ""
-/dmod/bin/$opt $n1 \"\" $n2 \"\" $n3 
+case $opt in 
+  ngen-parallel)
+    mpirun -n $procs /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3 $(pwd)/partitions_$procs.json
+  ;;
+  ngen-serial)
+    /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3
+  ;;
+esac
+
 echo "Would you like to continue?"
 select interact in interactive-shell exit; do
 
