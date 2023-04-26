@@ -51,7 +51,11 @@ select opt in ngen-parallel ngen-serial bash quit; do
       break
       ;;
     bash)
+<<<<<<< Updated upstream
       echo "Starting a shell, simply exit to stop the process."
+=======
+      echo "Starting a shell, simply exit to stop the process."i
+>>>>>>> Stashed changes
       cd /ngen/ngen
       /bin/bash
       ;;
@@ -99,4 +103,5 @@ select interact in interactive-shell exit; do
       ;;
   esac
 done
+cp /ngen/ngen/*.csv /ngen/ngen/data/outputs
 exit
