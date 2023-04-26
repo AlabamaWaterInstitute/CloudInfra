@@ -8,6 +8,9 @@ inputs:
   github-sha:
     description: 'github sha hash for tagging image'
     required: true
+  image-platform:
+    description: 'Platform of the image to be built'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -17,9 +20,9 @@ runs:
           echo "${{ inputs.docker-auth-token }}" | docker login --username awiciroh --password-stdin     
     - name: Build and tag Docker image
       shell: bash
-      run: docker build -t awiciroh/ciroh-ngen-image:${{ inputs.github-sha }} -t awiciroh/ciroh-ngen-image:latest docker/.      
+      run: docker build -t awiciroh/ciroh-ngen-image:${{ inputs.github-sha }} -t awiciroh/ciroh-ngen-image-{{ inputs.image-platform }}:latest docker/.      
     - name: Push Docker image
       shell: bash
       run: |
-        docker push awiciroh/ciroh-ngen-image:${{ inputs.github-sha }} 
-        docker push awiciroh/ciroh-ngen-image:latest
+        docker push awiciroh/ciroh-ngen-image-{{ inputs.image-platform }}:${{ inputs.github-sha }} 
+        docker push awiciroh/ciroh-ngen-image-{{ inputs.image-platform }}:latest

@@ -15,3 +15,4 @@ jobs:
         with:
           docker-auth-token: ${{ secrets.DOCKER_AUTH_TOKEN }}
           github-sha: ${{ github.sha }}
+          image-platform: "arm"
