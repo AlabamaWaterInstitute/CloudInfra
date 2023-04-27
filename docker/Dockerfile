@@ -478,25 +478,16 @@ USER ${USER}
 
 #These patches are from ngen commit 7551590a415b89026559c1c570d4154e4746161b
 #and are needed to fix an I/O bug in the sub modules (and bmi tests) that cause an infinite loop
-#the fix_tests patch cleans up some path handling to allow ctest to run automatically and detect
-#and run all tests (822 in serial, 828 in parallel -- some of which are duplicated)
-#Once these patches are applied upstream, this can be removed.
-# can be removed when https://github.com/NOAA-OWP/ngen/pull/515 is merged upstream
-COPY fix_tests_7551590a415b89026559c1c570d4154e4746161b.patch ${WORKDIR}/ngen/fix_tests.patch
-# All the affected submodules have patched/merged, but ngen submodules have not been updated to the current HEAD
+#https://github.com/NOAA-OWP/ngen/pull/515, https://github.com/NOAA-OWP/ngen/pull/518 both merged upstream, patch no longer needed
+# All the affected submodules have patched/merged in their respective upstream repos, 
+# but ngen submodules have not been updated to the current HEAD
 # of all the submdoules, and that might prove difficult to do in the near future, but if that does happen,
 # then this can be removed at that point.
 COPY fix_io_sub_7551590a415b89026559c1c570d4154e4746161b.patch ${WORKDIR}/ngen/fix_io_sub.patch
-# Can be removed when https://github.com/NOAA-OWP/ngen/pull/518 is merged upstream
-COPY fix_dir_7551590a415b89026559c1c570d4154e4746161b.patch ${WORKDIR}/ngen/fix_dir.patch
-# FIXME once these patches are all identified with issues/PR's upstream, drop some links in here
 # Apply the IO fix to submodules, once they all get patched/merged, this can be dropped...
 RUN cd ${WORKDIR}/ngen && git apply --reject --whitespace=fix \
     #patch the submodules
-    fix_io_sub.patch && \
-    #patch ngen
-    git apply --reject --whitespace=fix fix_tests.patch && \
-    git apply --reject --whitespace=fix fix_dir.patch
+    fix_io_sub.patch
 
 RUN cd ${WORKDIR}/ngen \
     && if [ "${NGEN_ACTIVATE_PYTHON}" == "ON" ]; then \
