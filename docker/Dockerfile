@@ -353,6 +353,7 @@ ARG TROUTE_REPO_URL
 ARG TROUTE_BRANCH
 ARG TROUTE_COMMIT
 ARG WORKDIR
+ARG UPDATE=2023-04-26
 
 WORKDIR ${WORKDIR}
 
@@ -370,6 +371,7 @@ ARG REPO_URL
 ARG BRANCH
 ARG COMMIT
 ARG WORKDIR
+ARG UPDATE=2023-04-27
 
 WORKDIR ${WORKDIR}
 
@@ -476,25 +478,16 @@ USER ${USER}
 
 #These patches are from ngen commit 7551590a415b89026559c1c570d4154e4746161b
 #and are needed to fix an I/O bug in the sub modules (and bmi tests) that cause an infinite loop
-#the fix_tests patch cleans up some path handling to allow ctest to run automatically and detect
-#and run all tests (822 in serial, 828 in parallel -- some of which are duplicated)
-#Once these patches are applied upstream, this can be removed.
-# can be removed when https://github.com/NOAA-OWP/ngen/pull/515 is merged upstream
-COPY fix_tests_7551590a415b89026559c1c570d4154e4746161b.patch ${WORKDIR}/ngen/fix_tests.patch
-# All the affected submodules have patched/merged, but ngen submodules have not been updated to the current HEAD
+#https://github.com/NOAA-OWP/ngen/pull/515, https://github.com/NOAA-OWP/ngen/pull/518 both merged upstream, patch no longer needed
+# All the affected submodules have patched/merged in their respective upstream repos, 
+# but ngen submodules have not been updated to the current HEAD
 # of all the submdoules, and that might prove difficult to do in the near future, but if that does happen,
 # then this can be removed at that point.
 COPY fix_io_sub_7551590a415b89026559c1c570d4154e4746161b.patch ${WORKDIR}/ngen/fix_io_sub.patch
-# Can be removed when https://github.com/NOAA-OWP/ngen/pull/518 is merged upstream
-COPY fix_dir_7551590a415b89026559c1c570d4154e4746161b.patch ${WORKDIR}/ngen/fix_dir.patch
-# FIXME once these patches are all identified with issues/PR's upstream, drop some links in here
 # Apply the IO fix to submodules, once they all get patched/merged, this can be dropped...
 RUN cd ${WORKDIR}/ngen && git apply --reject --whitespace=fix \
     #patch the submodules
-    fix_io_sub.patch && \
-    #patch ngen
-    git apply --reject --whitespace=fix fix_tests.patch && \
-    git apply --reject --whitespace=fix fix_dir.patch
+    fix_io_sub.patch
 
 RUN cd ${WORKDIR}/ngen \
     && if [ "${NGEN_ACTIVATE_PYTHON}" == "ON" ]; then \
@@ -589,17 +582,19 @@ ARG DATASET_DIRECTORIES
 # Remove the boost headers now that ngen is compiled; also update path and make sure dataset directory is there
 RUN rm -rf ${BOOST_ROOT} && echo "export PATH=${PATH}" >> /etc/profile \
     && mkdir -p /dmod/datasets && chown root /dmod/datasets \
+    && mkdir -p /dmod/datasets/static && chown root /dmod/datasets/static \
     && mkdir -p /dmod/shared_libs && chown root /dmod/shared_libs \
     && mkdir -p /dmod/bin && chown root /dmod/bin 
 
 # Change permissions for entrypoint and make sure dataset volume mount parent directories exists
 # chmod +x ${WORKDIR}/entrypoint.sh \
 RUN for d in ${DATASET_DIRECTORIES}; do mkdir -p /dmod/datasets/${d}; done \
-    && for d in noah-owp-modular topmodel cfe sloth 'evapotranspiration/evapotranspiration'; do \
+    && for d in iso_c_fortran_bmi noah-owp-modular topmodel cfe sloth 'evapotranspiration/evapotranspiration'; do \
         if [ -d ${WORKDIR}/ngen/extern/${d}/cmake_build ]; then \
             cp -a ${WORKDIR}/ngen/extern/${d}/cmake_build/*.so* /dmod/shared_libs/.; \
         fi; \
     done \
+    && find ${WORKDIR}/ngen/extern/noah-owp-modular -type f -iname "*.TBL" -exec cp '{}' /dmod/datasets/static  \; \
     && ( cp -a ${WORKDIR}/ngen/cmake_build_parallel/ngen /dmod/bin/ngen-parallel || true ) \
     && ( cp -a ${WORKDIR}/ngen/cmake_build_serial/ngen /dmod/bin/ngen-serial || true ) \
     && ( cp -a ${WORKDIR}/ngen/cmake_build/partitionGenerator /dmod/bin/partitionGenerator || true ) \
@@ -617,12 +612,10 @@ FROM rockylinux:9.1-minimal
 
 ########################################Copy over the NGEN artifacts############################################
 COPY --chown=root --from=rocky_build_staging /dmod/ /dmod/
-COPY --chown=root --from=rocky_build_staging /ngen/ngen/data/ /ngen/ngen/data/
-COPY --chown=root --from=rocky_build_staging /ngen/ngen/extern/ /ngen/ngen/extern/
 #COPY --chown=root --from=rocky_build_staging /usr/lib64/ /usr/lib64/
 COPY --chown=root --from=rocky_build_staging /usr/ /usr/
 ########################################Relink the files########################################################
-RUN ldconfig -v
+RUN echo "/dmod/shared_libs/" >> /etc/ld.so.conf.d/ngen.conf && ldconfig -v
 
 COPY   HelloNGEN.sh /ngen/HelloNGEN.sh
 RUN chown -R root /dmod /ngen /root
