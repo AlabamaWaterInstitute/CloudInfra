@@ -6,7 +6,7 @@ on:
       - docker/**
 jobs:
   build-and-push:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: deploy
         uses: actions/checkout@v2

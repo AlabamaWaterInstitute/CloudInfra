@@ -13,9 +13,3 @@ jobs:
           docker-auth-token: ${{ secrets.DOCKER_AUTH_TOKEN }}
           github-sha: ${{ github.sha }}
           image-platform: "x86"
-      - name: Build and push Docker image for arm
-        uses: ./.github/action_templates/build-and-push
-        with:
-          docker-auth-token: ${{ secrets.DOCKER_AUTH_TOKEN }}
-          github-sha: ${{ github.sha }}
-          image-platform: "arm"
