@@ -1,9 +1,6 @@
-name: Build and Push Docker image to Docker Hub
+name: Manual Build and Push x86 Docker image to Docker Hub
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - docker/**
+  workflow_dispatch:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
