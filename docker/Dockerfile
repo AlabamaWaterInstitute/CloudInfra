@@ -615,7 +615,7 @@ COPY --chown=root --from=rocky_build_staging /dmod/ /dmod/
 #COPY --chown=root --from=rocky_build_staging /usr/lib64/ /usr/lib64/
 COPY --chown=root --from=rocky_build_staging /usr/ /usr/
 ########################################Relink the files########################################################
-RUN ldconfig -v
+RUN echo "/dmod/shared_libs/" >> /etc/ld.so.conf.d/ngen.conf && ldconfig -v
 
 COPY   HelloNGEN.sh /ngen/HelloNGEN.sh
 RUN chown -R root /dmod /ngen /root
