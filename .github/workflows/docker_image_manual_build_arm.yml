@@ -3,10 +3,16 @@ on:
   workflow_dispatch:
 jobs:
   build-and-push:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: deploy
         uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: 'arm64,arm'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
       - name: Build and push Docker image
         uses: ./.github/action_templates/build-and-push
         with:
