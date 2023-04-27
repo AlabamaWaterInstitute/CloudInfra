@@ -72,10 +72,10 @@ echo "Your model run is beginning!"
 echo ""
 case $opt in 
   ngen-parallel)
-    mpirun -n $procs /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3 $(pwd)/partitions_$procs.json
+    mpirun -n $procs /dmod/bin/$opt $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
   ;;
   ngen-serial)
-    /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3
+    /dmod/bin/$opt $n1 all $n2 all $n3
   ;;
 esac
 
