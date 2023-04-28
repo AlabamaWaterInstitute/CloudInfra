@@ -59,14 +59,14 @@ echo -e "Detected ISA = $AARCH"
 docker --version
 if uname -a | grep arm64 ; then
 
-docker pull zwills/dmod_ngen_slim:arm
+docker pull awiciroh/ciroh-ngen-image:latest-arm
 echo -e "pulled arm ngen image"
-IMAGE_NAME=zwills/dmod_ngen_slim:arm
+IMAGE_NAME=awiciroh/ciroh-ngen-image:latest-arm
 else
 
-docker pull awiciroh/ciroh-ngen-image:latest
+docker pull awiciroh/ciroh-ngen-image:latest-x86
 echo -e "pulled x86 ngen image"
-IMAGE_NAME=awiciroh/ciroh-ngen-image:latest
+IMAGE_NAME=awiciroh/ciroh-ngen-image:latest-x86
 fi
 
 echo -e "Running docker with local host mounting $HOST_DATA_PATH to /ngen/ngen/data within the container."
