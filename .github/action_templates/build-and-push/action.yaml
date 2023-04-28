@@ -10,7 +10,7 @@ inputs:
     required: true
   image-platform:
     description: 'Platform of the image to be built'
-    required: false
+    required: true
 runs:
   using: "composite"
   steps:
@@ -18,10 +18,31 @@ runs:
       shell: bash
       run: |
           echo "${{ inputs.docker-auth-token }}" | docker login --username awiciroh --password-stdin     
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2 
-    # ------  Multiarch image ------
-    - name: Build and tag Docker image
+    # ------  ARM64 ------
+    - name: Build and tag Docker image (ARM64)
       shell: bash
-      run: docker buildx build --push --platform linux/arm64,linux/amd64 --tag awiciroh/ciroh-ngen-image:${{ inputs.github-sha }} -t awiciroh/ciroh-ngen-image:latest docker/.      
-      
+      run: docker build -t awiciroh/ciroh-ngen-image:${{ inputs.github-sha }} -t awiciroh/ciroh-ngen-image:latest-${{ inputs.image-platform }} docker/.      
+      if: ${{ inputs.image-platform }} != ''
+    
+    - name: Push Docker image (ARM64)
+      shell: bash
+      run: |
+        docker push awiciroh/ciroh-ngen-image:${{ inputs.github-sha }} 
+        docker push awiciroh/ciroh-ngen-image:latest-${{ inputs.image-platform }}
+      if: ${{ inputs.image-platform }} != ''
+    # -------- END --------
+
+    # -------- AMD64 -------
+    - name: Build and tag Docker image (amd64)
+      shell: bash
+      run: docker build -t awiciroh/ciroh-ngen-image:${{ inputs.github-sha }} -t awiciroh/ciroh-ngen-image:latest docker/.      
+      if: ${{ inputs.image-platform }} == ''
+    
+    - name: Push Docker image (amd64)
+      shell: bash
+      run: |
+        docker push awiciroh/ciroh-ngen-image:${{ inputs.github-sha }} 
+        docker push awiciroh/ciroh-ngen-image:latest
+      if: ${{ inputs.image-platform }} == ''
+
+    # -------- END ------ 
