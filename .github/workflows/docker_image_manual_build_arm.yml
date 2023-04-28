@@ -1,4 +1,4 @@
-name: Manual Build and Push Docker image to Docker Hub
+name: Manual Build and Push ARM Docker image to Docker Hub
 on:
   workflow_dispatch:
 jobs:
@@ -7,13 +7,13 @@ jobs:
     steps:
       - name: deploy
         uses: actions/checkout@v2
-      - name: Build and push Docker image for x86
-        uses: ./.github/action_templates/build-and-push
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
         with:
-          docker-auth-token: ${{ secrets.DOCKER_AUTH_TOKEN }}
-          github-sha: ${{ github.sha }}
-          image-platform: "x86"
-      - name: Build and push Docker image for arm
+          platforms: 'arm64,arm'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build and push Docker image
         uses: ./.github/action_templates/build-and-push
         with:
           docker-auth-token: ${{ secrets.DOCKER_AUTH_TOKEN }}

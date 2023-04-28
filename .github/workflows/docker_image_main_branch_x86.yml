@@ -1,4 +1,4 @@
-name: Build and Push ARM-compatible Docker image to Docker Hub
+name: Build and Push x86 Docker image to Docker Hub
 on:
   push:
     branches: [ main ]
@@ -6,13 +6,13 @@ on:
       - docker/**
 jobs:
   build-and-push:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: deploy
         uses: actions/checkout@v2
-      - name: Build and push ARM Docker image for NGEN
+      - name: Build and push Docker image
         uses: ./.github/action_templates/build-and-push
         with:
           docker-auth-token: ${{ secrets.DOCKER_AUTH_TOKEN }}
           github-sha: ${{ github.sha }}
-          image-platform: "arm"
+          image-platform: "x86"
