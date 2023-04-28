@@ -1,4 +1,4 @@
-name: Manual Build and Push x86 Docker image to Docker Hub
+name: Manual Build and Push Docker image to Docker Hub
 on:
   workflow_dispatch:
 jobs:
@@ -8,16 +8,8 @@ jobs:
       - name: deploy
         uses: actions/checkout@v2
         
-      - name: Build and push Docker image for amd64
+      - name: Build and push Docker image for multi-architecture
         uses: ./.github/action_templates/build-and-push
         with:
           docker-auth-token: ${{ secrets.DOCKER_AUTH_TOKEN }}
           github-sha: ${{ github.sha }}
-          image-platform: ""
-      
-      - name: Build and push Docker image for arm64
-        uses: ./.github/action_templates/build-and-push
-        with:
-          docker-auth-token: ${{ secrets.DOCKER_AUTH_TOKEN }}
-          github-sha: ${{ github.sha }}
-          image-platform: "arm"
