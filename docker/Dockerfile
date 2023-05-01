@@ -1,36 +1,27 @@
 ################################################################################################################
-################################################################################################################
-################################################################################################################
 ##### External Global Args Declaration and Defaults
 ################################################################################################################
 # Any args that will need to be set, first declare them here, then later redeclare them within stage that uses.
 # Also, for those with defaults, set those up here so that's easier to find.
-ARG DOCKER_INTERNAL_REGISTRY
 
 # Swap or override this as needed (below are the "standard" types from
 #   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#default-and-custom-configurations)
-#ARG NGEN_BUILD_CONFIG_TYPE="Debug"
-ARG NGEN_BUILD_CONFIG_TYPE="Release"
-#ARG NGEN_BUILD_CONFIG_TYPE="RelWithDebInfo"
-#ARG NGEN_BUILD_CONFIG_TYPE="MinSizeRel"
-
-ARG DATASET_DIRECTORIES="config forcing hydrofabric observation output"
-
-# Passing the ARG variables from compose via .env file will squash these defaults with empty strings
-# Seems like the work around is to replicate the default values in the build env, or to check for
-# empty and set to default as is shown commented out below.
-ARG REPO_URL=https://github.com/NOAA-OWP/ngen.git
-ARG BRANCH=master
-ARG COMMIT
-ARG WORKDIR=/ngen
-
-ARG TROUTE_REPO_URL=https://github.com/NOAA-OWP/t-route.git
-ARG TROUTE_BRANCH=master
-ARG TROUTE_COMMIT
-
+ARG DOCKER_INTERNAL_REGISTRY \
+    #NGEN_BUILD_CONFIG_TYPE="Debug" \
+    NGEN_BUILD_CONFIG_TYPE="Release" \
+    #NGEN_BUILD_CONFIG_TYPE="RelWithDebInfo" \
+    #NGEN_BUILD_CONFIG_TYPE="MinSizeRel" \
+    DATASET_DIRECTORIES="config forcing hydrofabric observation output" 
+ARG REPO_URL=https://github.com/NOAA-OWP/ngen.git \
+    BRANCH=master \
+    COMMIT \
+    WORKDIR=/ngen \
+    TROUTE_REPO_URL=https://github.com/NOAA-OWP/t-route.git \
+    TROUTE_BRANCH=master \
+    TROUTE_COMMIT \
 #### Default arguments for required dependencies needed during various build stages
 # The Rocky-Linux-based "base" stage, rocky-base
-ARG ROCKY_BASE_REQUIRED="sudo bash git"
+    ROCKY_BASE_REQUIRED="sudo bash git" \
 # The Rocky-Linux-based "ngen-deps" stage, rocky-ngen-deps
 # TODO: later look at separating build and run images again, and install static lib netcdf packages in run images
 #ARG ROCKY_NGEN_DEPS_REQUIRED="mpich mpich-devel sudo gcc gcc-c++ make cmake tar git gcc-gfortran libgfortran \
@@ -38,57 +29,51 @@ ARG ROCKY_BASE_REQUIRED="sudo bash git"
 #    netcdf-cxx4-devel netcdf-cxx4-mpich-devel netcdf-fortran-devel netcdf-fortran-mpich-devel \
 #    hdf5 hdf5-devel hdf5-mpich hdf5-mpich-devel \
 #    bzip2 expat expat-devel flex bison udunits2 udunits2-devel"
-
-ARG ROCKY_NGEN_DEPS_REQUIRED="sudo gcc gcc-c++ make cmake tar git gcc-gfortran libgfortran \
+    ROCKY_NGEN_DEPS_REQUIRED="sudo gcc gcc-c++ make cmake tar git gcc-gfortran libgfortran \
     python3 python3-devel python3-pip gdal gdal-devel\
-    bzip2 expat expat-devel flex bison udunits2 udunits2-devel zlib-devel"
+    bzip2 expat expat-devel flex bison udunits2 udunits2-devel zlib-devel" \
 # TODO: removed texinfo from list because it couldn't be found; make sure this doesn't lead to issues
 
-ARG BOOST_VERSION=1.72.0
+    BOOST_VERSION=1.72.0 \
 #TODO Try mpich 4.x for native arm build support (https://raw.githubusercontent.com/pmodels/mpich/v4.1.1/CHANGES)
 #mpich 3.2 doesn't work well gfortran 11 it seems, an alignment error crops up, but 3.3.2 seems to work...
-ARG MPICH_VERSION="3.3.2"
-ARG MIN_PYTHON="3.8.0"
-ARG MIN_NUMPY="1.18.0"
-
-ARG NETCDF_C_VERSION=4.8.1
-ARG NETCDF_CXX_VERSION=4.3.1
-ARG NETCDF_FORTRAN_VERSION=4.6.0
-ARG HD5_VERSION=1.10.9
-ARG BLOSC2_VERSION=v2.2.0
-
-# Work around Fortran MPI issue
-ARG FCFLAGS="-w -fallow-argument-mismatch -O2"
-ARG FFLAGS="-w -fallow-argument-mismatch -O2"
-ARG MPICH_CONFIGURE_OPTIONS=""
-ARG MPICH_MAKE_OPTIONS
-
-ARG NGEN_ACTIVATE_C="ON"
-ARG NGEN_ACTIVATE_FORTRAN="ON"
-ARG NGEN_ACTIVATE_PYTHON="ON"
-ARG NGEN_NETCDF_ACTIVE="ON"
-ARG NGEN_ROUTING_ACTIVE="ON"
-ARG NGEN_UDUNITS_ACTIVE="ON"
-ARG NGEN_UDUNITS_QUIET="ON"
-
-ARG BUILD_NGEN_SERIAL="true"
-ARG BUILD_NGEN_PARALLEL="true"
-ARG BUILD_NGEN_PARTITIONER="true"
-ARG BUILD_NOAH_OWP="true"
-ARG BUILD_CFE="true"
-ARG BUILD_TOPMODEL="true"
-ARG BUILD_PET="true"
-ARG BUILD_SLOTH="true"
+    MPICH_VERSION="3.3.2" \
+    MIN_PYTHON="3.8.0" \
+    MIN_NUMPY="1.18.0" \
+    NETCDF_C_VERSION=4.8.1 \
+    NETCDF_CXX_VERSION=4.3.1 \
+    NETCDF_FORTRAN_VERSION=4.6.0 \
+    HD5_VERSION=1.10.9 \
+    BLOSC2_VERSION=v2.2.0 \
+    FCFLAGS="-w -fallow-argument-mismatch -O2" \
+    FFLAGS="-w -fallow-argument-mismatch -O2" \
+    MPICH_CONFIGURE_OPTIONS="" \
+    MPICH_MAKE_OPTIONS \
+    NGEN_ACTIVATE_C="ON" \
+    NGEN_ACTIVATE_FORTRAN="ON" \
+    NGEN_ACTIVATE_PYTHON="ON" \
+    NGEN_NETCDF_ACTIVE="ON" \
+    NGEN_ROUTING_ACTIVE="ON" \
+    NGEN_UDUNITS_ACTIVE="ON" \
+    NGEN_UDUNITS_QUIET="ON" \
+    BUILD_NGEN_SERIAL="true" \
+    BUILD_NGEN_PARALLEL="true" \
+    BUILD_NGEN_PARTITIONER="true" \
+    BUILD_NOAH_OWP="true" \
+    BUILD_CFE="true" \
+    BUILD_TOPMODEL="true" \
+    BUILD_PET="true" \
+    BUILD_SLOTH="true" 
 
 ################################################################################################################
 ################################################################################################################
 ##### Create intermediate Docker build stage for Rocky-Linux-based "base"
 FROM rockylinux:9.1 as rocky-base
 
-#ARG USER=root
+#USER=root
 
-ARG ROCKY_BASE_REQUIRED
-
+ARG ROCKY_BASE_REQUIRED \
+    WORKDIR=/ngen 
 RUN dnf update -y \
     && dnf install -y 'dnf-command(config-manager)' \
     && dnf config-manager --set-enabled crb \
@@ -97,10 +82,10 @@ RUN dnf update -y \
     # Note that adduser -p expects an encrypted/hashed password, so it will ignore a simple password \
     # Config SSH Daemon \
     # Unlock non-password USER to enable SSH login \
-    #&& passwd -u ${USER} \
+    #&& passwd -u ${USER} 
 
 
-ARG WORKDIR=/ngen
+
 
 # Switch back to default user when continue the build process
 
@@ -233,45 +218,40 @@ RUN dnf update -y && dnf install -y ${ROCKY_NGEN_DEPS_REQUIRED} \
 FROM rocky-ngen-packaged-deps as rocky-ngen-deps
 
 #USER root
-ARG BOOST_VERSION
-ARG WORKDIR
+ARG BOOST_VERSION \
+    WORKDIR  \
+    MPICH_VERSION \
+    MIN_PYTHON \
+    MIN_NUMPY \
+    ROCKY_NGEN_DEPS_REQUIRED \
+    MPICH_CONFIGURE_OPTIONS \
+    MPICH_MAKE_OPTIONS \
+    HD5_VERSION \
+    NETCDF_C_VERSION \
+    NETCDF_CXX_VERSION \
+    NETCDF_FORTRAN_VERSION 
 
-ENV WORKDIR=${WORKDIR}
-ENV BOOST_ROOT=${WORKDIR}/boost
+ENV WORKDIR=${WORKDIR} \
+    BOOST_ROOT=${WORKDIR}/boost \
+    MPICH_CONFIGURE_OPTIONS=${MPICH_CONFIGURE_OPTIONS} \
+    MPICH_MAKE_OPTIONS=${MPICH_MAKE_OPTIONS} \
+    HD5_VERSION=${HD5_VERSION} \
+    NETCDF_C_VERSION=${NETCDF_C_VERSION} \
+    NETCDF_CXX_VERSION=${NETCDF_CXX_VERSION} \
+    NETCDF_FORTRAN_VERSION=${NETCDF_FORTRAN_VERSION} \
+    HYDRA_HOST_FILE=/etc/opt/hosts
 
-COPY --from=download_boost /boost ${WORKDIR}/boost
-
-ARG MPICH_VERSION
-ARG MIN_PYTHON
-ARG MIN_NUMPY
-ARG ROCKY_NGEN_DEPS_REQUIRED
-
-ARG MPICH_CONFIGURE_OPTIONS
-ARG MPICH_MAKE_OPTIONS
-ARG HD5_VERSION
-ARG NETCDF_C_VERSION
-ARG NETCDF_CXX_VERSION
-ARG NETCDF_FORTRAN_VERSION
-
-ENV MPICH_CONFIGURE_OPTIONS=${MPICH_CONFIGURE_OPTIONS}
-ENV MPICH_MAKE_OPTIONS=${MPICH_MAKE_OPTIONS}
-ENV HD5_VERSION=${HD5_VERSION}
-ENV NETCDF_C_VERSION=${NETCDF_C_VERSION}
-ENV NETCDF_CXX_VERSION=${NETCDF_CXX_VERSION}
-ENV NETCDF_FORTRAN_VERSION=${NETCDF_FORTRAN_VERSION}
-
-COPY --from=download_mpich /tmp/mpich-${MPICH_VERSION}.tar.gz /tmp/ngen-deps/mpich-${MPICH_VERSION}.tar.gz
-COPY --from=download_hd5 /tmp/hdf5-${HD5_VERSION}.tar.gz /tmp/ngen-deps/hdf5-${HD5_VERSION}.tar.gz
-COPY --from=download_netcdf /tmp/netcdf-${NETCDF_C_VERSION}.tar.gz /tmp/ngen-deps/netcdf-${NETCDF_C_VERSION}.tar.gz
-COPY --from=download_netcdf_cxx /tmp/netcdf-cxx4-${NETCDF_CXX_VERSION}.tar.gz /tmp/ngen-deps/netcdf-cxx4-${NETCDF_CXX_VERSION}.tar.gz
+COPY --from=download_boost /boost ${WORKDIR}/boost 
+COPY --from=download_mpich /tmp/mpich-${MPICH_VERSION}.tar.gz /tmp/ngen-deps/mpich-${MPICH_VERSION}.tar.gz  
+COPY --from=download_hd5 /tmp/hdf5-${HD5_VERSION}.tar.gz /tmp/ngen-deps/hdf5-${HD5_VERSION}.tar.gz 
+COPY --from=download_netcdf /tmp/netcdf-${NETCDF_C_VERSION}.tar.gz /tmp/ngen-deps/netcdf-${NETCDF_C_VERSION}.tar.gz 
+COPY --from=download_netcdf_cxx /tmp/netcdf-cxx4-${NETCDF_CXX_VERSION}.tar.gz /tmp/ngen-deps/netcdf-cxx4-${NETCDF_CXX_VERSION}.tar.gz 
 COPY --from=download_netcdf_fortran /tmp/netcdf-fortran-${NETCDF_FORTRAN_VERSION}.tar.gz /tmp/ngen-deps/netcdf-fortran-${NETCDF_FORTRAN_VERSION}.tar.gz
 
-RUN pip3 install --upgrade pip
-RUN pip3 install -t /ngen numpy pandas pyyaml bmipy Cython netCDF4 wheel packaging opencv-contrib-python-headless
-
-ENV HYDRA_HOST_FILE=/etc/opt/hosts
-# Hostfile location for mpirun. This file will be updated automatically.
-RUN echo "export HYDRA_HOST_FILE=${HYDRA_HOST_FILE}" >> /etc/profile \
+RUN pip3 install --upgrade pip \
+    && pip3 install -t /ngen numpy pandas pyyaml bmipy Cython netCDF4 wheel packaging opencv-contrib-python-headless \
+    # Hostfile location for mpirun. This file will be updated automatically.
+    && echo "export HYDRA_HOST_FILE=${HYDRA_HOST_FILE}" >> /etc/profile \
     && touch ${HYDRA_HOST_FILE} \
     ################### Build and install dependencies from source ################### \
     ##### Prep temp build root directory \
@@ -340,7 +320,7 @@ RUN echo "export HYDRA_HOST_FILE=${HYDRA_HOST_FILE}" >> /etc/profile \
     && cd ${BOOST_ROOT} \
     && tar -xjf boost_${BOOST_VERSION//./_}.tar.bz2 \
     && rm boost_${BOOST_VERSION//./_}.tar.bz2 \
-    && rm -rf /tmp/ngen-deps
+    && rm -rf /tmp/ngen-deps 
 
 ENV PATH=${PATH}:/usr/lib64/mpich/bin
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib:/usr/local/lib64
@@ -349,11 +329,11 @@ ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib:/usr/local/lib64
 ################################################################################################################
 ##### Create intermediate Docker build stage for building t-route in Rocky Linux environment
 FROM rocky-base as rocky_init_troute_repo
-ARG TROUTE_REPO_URL
-ARG TROUTE_BRANCH
-ARG TROUTE_COMMIT
-ARG WORKDIR
-ARG UPDATE=2023-04-26
+ARG TROUTE_REPO_URL \
+    TROUTE_BRANCH \
+    TROUTE_COMMIT \
+    WORKDIR \
+    UPDATE=2023-04-26
 
 WORKDIR ${WORKDIR}
 
@@ -367,11 +347,11 @@ RUN cd ${WORKDIR} \
 ################################################################################################################
 ##### Create intermediate Docker build stage for building framework in Rocky Linux environment
 FROM rocky-base as rocky_init_repo
-ARG REPO_URL
-ARG BRANCH
-ARG COMMIT
-ARG WORKDIR
-ARG UPDATE=2023-04-27
+ARG REPO_URL \
+    BRANCH \
+    COMMIT \
+    WORKDIR \
+    UPDATE=2023-04-27
 
 WORKDIR ${WORKDIR}
 
@@ -405,16 +385,15 @@ WORKDIR ${WORKDIR}/ngen
 ##### Create intermediate Docker build stage for building t-route in Rocky Linux environment
 FROM rocky-ngen-deps as rocky_build_troute
 
-ARG REPO_URL
-ARG BRANCH
-ARG COMMIT
+ARG REPO_URL \
+    BRANCH \
+    COMMIT
 
 COPY --chown=root --from=rocky_init_troute_repo ${WORKDIR}/t-route ${WORKDIR}/t-route
 
-RUN cp -s /usr/bin/python3 /usr/bin/python
-
-#    && python(){ /usr/bin/python3 \$@; } && export -f python \
-RUN cd ${WORKDIR}/t-route \
+RUN cp -s /usr/bin/python3 /usr/bin/python \
+    #&& python(){ /usr/bin/python3 \$@; } && export -f python \
+    && cd ${WORKDIR}/t-route \
     && mkdir wheels \
     && pip3 install -r ./requirements.txt \
     && pip3 install wheel deprecated dask pyarrow geopandas
@@ -438,27 +417,25 @@ RUN rm /usr/bin/python
 ##### Create intermediate Docker build stage for building framework in Rocky Linux environment
 FROM rocky-ngen-deps as rocky_build_ngen
 
-ARG REPO_URL
-ARG BRANCH
-ARG COMMIT
-
-ARG NGEN_BUILD_CONFIG_TYPE
-ARG NGEN_ACTIVATE_C
-ARG NGEN_ACTIVATE_FORTRAN
-ARG NGEN_ACTIVATE_PYTHON
-ARG NGEN_NETCDF_ACTIVE
-ARG NGEN_ROUTING_ACTIVE
-ARG NGEN_UDUNITS_ACTIVE
-ARG NGEN_UDUNITS_QUIET
-
-ARG BUILD_NGEN_SERIAL
-ARG BUILD_NGEN_PARALLEL
-ARG BUILD_NGEN_PARTITIONER
-ARG BUILD_NOAH_OWP
-ARG BUILD_CFE
-ARG BUILD_TOPMODEL
-ARG BUILD_PET
-ARG BUILD_SLOTH
+ARG REPO_URL \
+    BRANCH \
+    COMMIT \
+    NGEN_BUILD_CONFIG_TYPE \
+    NGEN_ACTIVATE_C \
+    NGEN_ACTIVATE_FORTRAN \
+    NGEN_ACTIVATE_PYTHON \
+    NGEN_NETCDF_ACTIVE \
+    NGEN_ROUTING_ACTIVE \
+    NGEN_UDUNITS_ACTIVE \
+    NGEN_UDUNITS_QUIET \
+    BUILD_NGEN_SERIAL \
+    BUILD_NGEN_PARALLEL \
+    BUILD_NGEN_PARTITIONER \
+    BUILD_NOAH_OWP \
+    BUILD_CFE \
+    BUILD_TOPMODEL \
+    BUILD_PET \
+    BUILD_SLOTH
 
 COPY --chown=${USER} --from=rocky_init_repo ${WORKDIR}/ngen ${WORKDIR}/ngen
 COPY --chown=${USER} --from=rocky_build_troute ${WORKDIR}/t-route/wheels /tmp/t-route-wheels
