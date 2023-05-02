@@ -1,15 +1,17 @@
 #!/bin/bash
-
+workdir="${1:-/ngen}"
+cd ${workdir}
 set -e
 echo "Working directory is " 
 pwd
-HYDRO_FABRIC_CATCHMENTS=$(find /ngen/ngen/data -name "*catchment*.geojson")
-HYDRO_FABRIC_NEXUS=$(find /ngen/ngen/data -name "*nexus*.geojson")
-NGEN_REALIZATIONS=$(find /ngen/ngen/data -name "*realization*.json")
+
+HYDRO_FABRIC_CATCHMENTS=$(find ${workdir} -name "*catchment*.geojson")
+HYDRO_FABRIC_NEXUS=$(find ${workdir} -name "*nexus*.geojson")
+NGEN_REALIZATIONS=$(find ${workdir} -name "*realization*.json")
 #pwd
-echo -e "\e[4mFound these Catchment files in /ngen/ngen/data:\e[0m" && sleep 1 && echo "$HYDRO_FABRIC_CATCHMENTS"
-echo -e "\e[4mFound these Nexus files in /ngen/ngen/data:\e[0m" && sleep 1 && echo "$HYDRO_FABRIC_NEXUS"
-echo -e "\e[4mFound these Realization files in /ngen/ngen/data:\e[0m" && sleep 1 && echo "$NGEN_REALIZATIONS"
+echo -e "\e[4mFound these Catchment files in ${workdir}:\e[0m" && sleep 1 && echo "$HYDRO_FABRIC_CATCHMENTS"
+echo -e "\e[4mFound these Nexus files in ${workdir}:\e[0m" && sleep 1 && echo "$HYDRO_FABRIC_NEXUS"
+echo -e "\e[4mFound these Realization files in ${workdir}:\e[0m" && sleep 1 && echo "$NGEN_REALIZATIONS"
 
 generate_partition () {
   # $1 catchment json file
@@ -52,7 +54,7 @@ select opt in ngen-parallel ngen-serial bash quit; do
       ;;
     bash)
       echo "Starting a shell, simply exit to stop the process."
-      cd /ngen/ngen
+      cd ${workdir}
       /bin/bash
       ;;
     quit)
@@ -70,10 +72,10 @@ echo "Your model run is beginning!"
 echo ""
 case $opt in 
   ngen-parallel)
-    mpirun -n $procs /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3 $(pwd)/partitions_$procs.json
+    mpirun -n $procs /dmod/bin/$opt $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
   ;;
   ngen-serial)
-    /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3
+    /dmod/bin/$opt $n1 all $n2 all $n3
   ;;
 esac
 
@@ -83,7 +85,7 @@ select interact in interactive-shell exit; do
   case $interact in
     interactive-shell)
       echo "Starting a shell, simply exit to stop the process."
-      cd /ngen/ngen
+      cd ${workdir}
       /bin/bash
       break
       ;;
