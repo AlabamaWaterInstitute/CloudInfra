@@ -67,9 +67,16 @@ select opt in ngen-parallel ngen-serial bash quit; do
 done
 echo "The tested model is /dmod/bin/ngen-serial /ngen/data/catchment_data.geojson "" /ngen/data/nexus_data.geojson "" /ngen/ngen/data/example_realization_config.json"
 echo "If your model didn't run, or encountered an error, try checking the Forcings paths in the Realizations file you selected."
-echo ""
-echo "Your model run is beginning!"
-echo ""
+select opt in run stop; do
+  run)
+    echo ""
+    echo "Your model run is beginning!"
+    echo ""
+  ;;
+  stop)
+    /bin/bash
+  ;;
+esac
 case $opt in 
   ngen-parallel)
     mpirun -n $procs /dmod/bin/$opt $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
@@ -80,7 +87,7 @@ case $opt in
 esac
 
 echo "Would you like to continue?"
-select interact in interactive-shell exit; do
+select interact in interactive-shell copy exit; do
 
   case $interact in
     interactive-shell)
@@ -89,11 +96,14 @@ select interact in interactive-shell exit; do
       /bin/bash
       break
       ;;
-    exit)
-      echo "Have a nice day."
+    copy)
+      [ -d /ngen/ngen/data/outputs ] || mkdir /ngen/ngen/data/outputs
+      cp /ngen/*.csv /ngen/ngen/data/outputs
+      cp /ngen/*.json /ngen/ngen/data/outputs
       break
       ;;
-    quit)
+    exit)
+      echo "Have a nice day."
       break
       ;;
     *) 
@@ -101,5 +111,5 @@ select interact in interactive-shell exit; do
       ;;
   esac
 done
-cp /ngen/ngen/*.csv /ngen/ngen/data/outputs
+#cp /ngen/ngen/*.csv /ngen/ngen/data/outputs
 exit
