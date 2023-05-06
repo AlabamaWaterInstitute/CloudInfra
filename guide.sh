@@ -62,8 +62,8 @@ echo -e "Detected ISA = $AARCH"
 if docker --version ; then
 	echo "Docker found"
 else 
-	echo "Docker not found"
-	break
+	echo "Docker not found."
+	exit 0
 fi 
 
 select modelrun in run_NextGen exit; do
