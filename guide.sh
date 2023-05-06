@@ -38,10 +38,13 @@ read -p "Enter your data directory file path: " HOST_DATA_PATH
 
 echo -e "The Directory you've given is:" && echo "$HOST_DATA_PATH"
 
+Outputs_Count=$(ls $HOST_DATA_PATH/outputs | wc -l)
+
+
 #Validate paths exist:
-[ -d "$HOST_DATA_PATH/forcings" ] && echo -e "${BBlue}forcings${Color_Off} exists." || echo -e "Error: Directory $HOST_DATA_PATH/${BBlue}forcings${Color_Off} does not exist."
-[ -d "$HOST_DATA_PATH/outputs" ] && echo -e "${BPurple}outputs${Color_Off} exists." || echo -e "Error: Directory $HOST_DATA_PATH/${BPurple}outputs${Color_Off} does not exist." 
-[ -d "$HOST_DATA_PATH/config" ] && echo -e "${BGreen}config${Color_Off} exists." || echo -e "Error: Directory $HOST_DATA_PATH/${BGreen}config${Color_Off} does not exist."
+[ -d "$HOST_DATA_PATH/forcings" ] && echo -e "${BBlue}forcings${Color_Off} exists. $(ls $HOST_DATA_PATH/forcings | wc -l) forcings found." || echo -e "Error: Directory $HOST_DATA_PATH/${BBlue}forcings${Color_Off} does not exist."
+[ -d "$HOST_DATA_PATH/outputs" ] && echo -e "${BPurple}outputs${Color_Off} exists. $(ls $HOST_DATA_PATH/outputs | wc -l) outputs found." || echo -e "Error: Directory $HOST_DATA_PATH/${BPurple}outputs${Color_Off} does not exist." 
+[ -d "$HOST_DATA_PATH/config" ] && echo -e "${BGreen}config${Color_Off} exists. $(ls $HOST_DATA_PATH/config | wc -l) configs found." || echo -e "Error: Directory $HOST_DATA_PATH/${BGreen}config${Color_Off} does not exist."
 
 echo "Looking in the provided directory gives us:" 
 
@@ -56,7 +59,31 @@ echo -e "${UGreen}Found these Realization files:${Color_Off}" && sleep 1 && echo
 #Detect Arch
 AARCH=$(uname -a)
 echo -e "Detected ISA = $AARCH" 
-docker --version
+if docker --version ; then
+	echo "Docker found"
+else 
+	echo "Docker not found"
+	break
+fi 
+
+select modelrun in run_NextGen exit; do
+
+  case $modelrun in
+    run_NextGen)
+      echo "Pulling and running AWI NextGen Image"
+      break
+      ;;
+    exit)
+      echo "Have a nice day."
+      exit 0
+      ;;
+    *) 
+      echo "Invalid option $REPLY, 1 to continue and 2 to exit"
+      ;;
+  esac
+done
+
+
 if uname -a | grep arm64 ; then
 
 docker pull awiciroh/ciroh-ngen-image:latest-arm
@@ -72,5 +99,9 @@ fi
 echo -e "Running docker with local host mounting $HOST_DATA_PATH to /ngen/ngen/data within the container."
 docker run --rm -it -v $HOST_DATA_PATH:/ngen/ngen/data $IMAGE_NAME
 
-echo -e "Have a nice day!"
+Final_Outputs_Count=$(ls $HOST_DATA_PATH/outputs | wc -l)
 
+count=$((Final_Outputs_Count-Outputs_Count))
+echo -e "$count new outputs created."
+
+echo -e "Have a nice day!"
