@@ -1,5 +1,17 @@
+# Welcome to NextGen Framework National Water Model Community Repo. (NextGen In A Box).
 
-# Guide.sh - Bash script that is used to run the NGEN model. 
+This repository contains :
+- Dockerfile for running NextGen Framework (docker/Dockerfile)
+- Terraform configuration files for provisioning infrastructure in AWS (terraform/README.md)
+- Documentation of how to use the infrastructure and run the model. (README.md)
+
+## Clone the repo
+
+`git clone https://github.com/AlabamaWaterInstitute/CloudInfra.git`
+
+## Run the script:
+
+### Guide.sh - Bash script that is used to run the NGEN model. 
 
 1.	The script first prompts for entering the Input data directory file path where forcings and config files are stored.
 
