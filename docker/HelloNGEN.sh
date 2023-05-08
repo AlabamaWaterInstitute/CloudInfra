@@ -67,16 +67,9 @@ select opt in ngen-parallel ngen-serial bash quit; do
 done
 echo "The tested model is /dmod/bin/ngen-serial /ngen/data/catchment_data.geojson "" /ngen/data/nexus_data.geojson "" /ngen/ngen/data/example_realization_config.json"
 echo "If your model didn't run, or encountered an error, try checking the Forcings paths in the Realizations file you selected."
-select opt in run stop; do
-  run)
-    echo ""
-    echo "Your model run is beginning!"
-    echo ""
-  ;;
-  stop)
-    /bin/bash
-  ;;
-esac
+echo "Your model run is beginning!"
+echo ""
+
 case $opt in 
   ngen-parallel)
     mpirun -n $procs /dmod/bin/$opt $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
