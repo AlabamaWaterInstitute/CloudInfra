@@ -97,7 +97,7 @@ IMAGE_NAME=awiciroh/ciroh-ngen-image:latest-x86
 fi
 echo -e "Running NextGen in Docker."
 echo -e "Running container mounting local host directory $HOST_DATA_PATH to /ngen/ngen/data within the container."
-docker run --rm -it -v $HOST_DATA_PATH:/ngen/ngen/data $IMAGE_NAME
+docker run --rm -it -v $HOST_DATA_PATH:/ngen/ngen/data $IMAGE_NAME /ngen/ngen/data/
 
 Final_Outputs_Count=$(ls $HOST_DATA_PATH/outputs | wc -l)
 
