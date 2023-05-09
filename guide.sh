@@ -105,6 +105,7 @@ select modelrun in run_NextGen exit; do
       ;;
     exit)
       echo "Have a nice day."
+      exit 0
 echo -e "Running NextGen in Docker."
 echo -e "Running container mounting local host directory $HOST_DATA_PATH to /ngen/ngen/data within the container."
 docker run --rm -it -v $HOST_DATA_PATH:/ngen/ngen/data $IMAGE_NAME /ngen/ngen/data/
@@ -115,3 +116,4 @@ count=$((Final_Outputs_Count-Outputs_Count))
 echo -e "$count new outputs created."
 
 echo -e "Have a nice day!"
+exit 0
