@@ -5,19 +5,26 @@ This repository contains :
 - Terraform configuration files for provisioning infrastructure in AWS (terraform/README.md)
 - Documentation of how to use the infrastructure and run the model. (README.md)
 
-## Clone the repo
-
-Clone the repo using below commands:
-
-    $ cd ~/Documents
-    $ mkdir NextGen
-    $ cd NextGen
-    $ git clone https://github.com/AlabamaWaterInstitute/CloudInfra.git
-
 ## Prerequisites:
 
-1. Install docker in local machine and docker deamon is running.
-2. Download the input data in "ngen-data" folder :
+1. Install docker:
+    - On Windows:
+        [Install Docker Desktop on Windows](https://docs.docker.com/desktop/install/windows-install/#install-docker-desktop-on-windows)
+    - On Mac:
+          [Install docker on Mac](https://docs.docker.com/desktop/install/mac-install/) 
+    - On Linux:
+          [Install docker on Linux](https://docs.docker.com/desktop/install/linux-install/)    
+
+2. Start docker:
+    On windows: 
+        Once docker is installed, start Docker Destop.
+        Open powershell -> right click and `Run as an Administrator` 
+        Type `docker ps -a` to make sure docker is working.
+    
+    On Mac:
+        Start Docker Desktop
+    
+4. Download the input data in "ngen-data" folder :
 
         - Download input data from S3 bucket:
                 $ cd ~/Documents/NextGen
@@ -36,6 +43,17 @@ Clone the repo using below commands:
             $ pwd
             Copy the path that will be used in the step #1 below while running guide.sh script.`
 
+## Clone the repo
+
+Clone the repo using below commands:
+
+    $ cd ~/Documents
+    $ mkdir NextGen
+    $ cd NextGen
+    $ git clone https://github.com/AlabamaWaterInstitute/CloudInfra.git
+    $ cd CloudInfra
+    
+    
 ## Run the script:
 
 ### guide.sh - Bash script that is used to run the NGEN model. 
