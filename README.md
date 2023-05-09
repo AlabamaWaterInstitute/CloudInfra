@@ -17,9 +17,11 @@ This repository contains :
     `wget --no-parent https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-001/AWI_03W_113060_001.tar.gz`
 
     Untar using:
-    cd $PATH/ngen-data
-    Run `tar -xvf AWI_03W_113060_001.tar.gz`
-    pwd (copy the path of AWI_03W_113060_001 folder).
+        $ cd $PATH/ngen-data
+        Run:
+        $ tar -xvf AWI_03W_113060_001.tar.gz
+        Copy the path from below command:
+        $ pwd
 
 ## Run the script:
 
