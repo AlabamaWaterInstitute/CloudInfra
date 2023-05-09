@@ -7,33 +7,34 @@ This repository contains :
 
 ## Clone the repo
 
-$ cd ~/Documents
-$ mkdir ngen
-$ cd ngen
-$ git clone https://github.com/AlabamaWaterInstitute/CloudInfra.git
+Clone the repo using below commands:
+
+    $ cd ~/Documents
+    $ mkdir NextGen
+    $ cd NextGen
+    $ git clone https://github.com/AlabamaWaterInstitute/CloudInfra.git
 
 ## Prerequisites:
 
 1. Install docker in local machine and docker deamon is running.
-2. Download the input data in "ngen-data" folder under $PATH (any location in local machine) :
+2. Download the input data in "ngen-data" folder :
 
-    - Download input data from S3 bucket:
-        $ cd ~/Documents/ngen
-        $ mkdir ngen-data
+        - Download input data from S3 bucket:
+                $ cd ~/Documents/NextGen
+                $ mkdir ngen-data
+                $ cd ngen-data
 
-        $ cd ngen-data
+            $ `wget --no-parent https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-001/AWI_03W_113060_001.tar.gz` 
+            OR
+            Use browser to download the data from https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-001/AWI_03W_113060_001.tar.gz
 
-        $ `wget --no-parent https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-001/AWI_03W_113060_001.tar.gz` 
-        OR
-        Use browser to download the data from https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-001/AWI_03W_113060_001.tar.gz
+         - Untar:
+            $ tar -xf AWI_03W_113060_001.tar.gz
 
-     - Untar:
-        $ tar -xf AWI_03W_113060_001.tar.gz
-        
-     - Copy the path from below command:
-        $ cd AWI_03W_113060_001
-        $ pwd
-        Copy the path that will be used in the step #1 below while running guide.sh script.
+         - Copy the path from below command:
+            `$ cd AWI_03W_113060_001
+            $ pwd
+            Copy the path that will be used in the step #1 below while running guide.sh script.`
 
 ## Run the script:
 
