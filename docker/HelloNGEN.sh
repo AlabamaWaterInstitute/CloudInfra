@@ -91,8 +91,9 @@ select interact in interactive-shell copy exit; do
       ;;
     copy)
       [ -d /ngen/ngen/data/outputs ] || mkdir /ngen/ngen/data/outputs
-      cp /ngen/*.csv /ngen/ngen/data/outputs
-      cp /ngen/*.json /ngen/ngen/data/outputs
+      cp /ngen/ngen/data/*.csv /ngen/ngen/data/outputs
+      cp /ngen/ngen/data/*.json /ngen/ngen/data/outputs
+      cp /ngen/ngen/data/*.parquet /ngen/ngen/data/outputs
       break
       ;;
     exit)
