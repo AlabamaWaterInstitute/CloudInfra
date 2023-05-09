@@ -80,7 +80,7 @@ case $opt in
 esac
 
 echo "Would you like to continue?"
-select interact in interactive-shell copy exit; do
+select interact in interactive-shell copy_data exit; do
 
   case $interact in
     interactive-shell)
@@ -89,11 +89,11 @@ select interact in interactive-shell copy exit; do
       /bin/bash
       break
       ;;
-    copy)
+    copy_data)
       [ -d /ngen/ngen/data/outputs ] || mkdir /ngen/ngen/data/outputs
-      cp /ngen/ngen/data/*.csv /ngen/ngen/data/outputs
-      cp /ngen/ngen/data/*.json /ngen/ngen/data/outputs
-      [ -e /ngen/ngen/data/*.parquet ] || cp /ngen/ngen/data/*.parquet /ngen/ngen/data/outputs
+      mv /ngen/ngen/data/*.csv /ngen/ngen/data/outputs
+      mv /ngen/ngen/data/*.json /ngen/ngen/data/outputs
+      [ -e /ngen/ngen/data/*.parquet ] || mv /ngen/ngen/data/*.parquet /ngen/ngen/data/outputs
       break
       ;;
     exit)
