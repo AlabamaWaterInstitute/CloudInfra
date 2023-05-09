@@ -13,12 +13,11 @@ This repository contains :
 
 1. Install docker in local machine
 2. Download the input data in "ngen-data" folder under $PATH (any location in local machine) :
-    - Sample data is available on S3 bucket that can be downloaded using below command:
-    - Download input data from S3 bucket:​
+    - Download input data from S3 bucket:
 
-        $ mkdir ngen-data​
+        $ mkdir ngen-data
 
-        $ cd ngen-data​
+        $ cd ngen-data
 
         $ `wget --no-parent https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-001/AWI_03W_113060_001.tar.gz`
 
