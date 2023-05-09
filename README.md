@@ -24,7 +24,7 @@ This repository contains :
         Use browser to download the data from https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-001/AWI_03W_113060_001.tar.gz
 
      - Untar:
-        $ tar -xvf AWI_03W_113060_001.tar.gz
+        $ tar -xf AWI_03W_113060_001.tar.gz
         
      - Copy the path from below command:
         $ pwd
