@@ -7,14 +7,18 @@ This repository contains :
 
 ## Clone the repo
 
-`git clone https://github.com/AlabamaWaterInstitute/CloudInfra.git`
+$ cd ~/Documents
+$ mkdir ngen
+$ cd ngen
+$ git clone https://github.com/AlabamaWaterInstitute/CloudInfra.git
 
 ## Prerequisites:
 
 1. Install docker in local machine and docker deamon is running.
 2. Download the input data in "ngen-data" folder under $PATH (any location in local machine) :
-    - Download input data from S3 bucket:
 
+    - Download input data from S3 bucket:
+        $ cd ~/Documents/ngen
         $ mkdir ngen-data
 
         $ cd ngen-data
@@ -27,11 +31,17 @@ This repository contains :
         $ tar -xf AWI_03W_113060_001.tar.gz
         
      - Copy the path from below command:
+        $ cd AWI_03W_113060_001
         $ pwd
+        Copy the path that will be used in the step #1 below while running guide.sh script.
 
 ## Run the script:
 
-### Guide.sh - Bash script that is used to run the NGEN model. 
+### guide.sh - Bash script that is used to run the NGEN model. 
+
+    Go to the cloned repo and 
+    $ cd CloudInfra
+    $ ./guide.sh
 
 1.	The script first prompts for entering the Input data directory file path where forcings and config files are stored. (Prerequisites Step#2 - copied path)
 
