@@ -19,6 +19,7 @@ runs:
       run: |
           echo "${{ inputs.docker-auth-token }}" | docker login --username awiciroh --password-stdin
     - name: Clean docker cache
+      shell: bash
       run: |
         docker system prune -af
     - name: Build and tag Docker image
