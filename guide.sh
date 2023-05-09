@@ -34,7 +34,7 @@ echo -e "${BPurple}outputs${Color_Off} is where we'll put your data when it's fi
 echo -e "${BGreen}config${Color_Off} is where changes to models can be made"
 echo -e "\n"
 echo -e "Make sure to use an absolute path."
-read -p "Enter your data directory file path: " HOST_DATA_PATH
+read -rp "Enter your data directory file path: " HOST_DATA_PATH
 
 echo -e "The Directory you've given is:" && echo "$HOST_DATA_PATH"
 
