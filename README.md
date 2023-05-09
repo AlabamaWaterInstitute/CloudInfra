@@ -11,7 +11,7 @@ This repository contains :
 
 ## Prerequisites:
 
-1. Install docker in local machine
+1. Install docker in local machine and docker deamon is running.
 2. Download the input data in "ngen-data" folder under $PATH (any location in local machine) :
     - Download input data from S3 bucket:
 
@@ -19,10 +19,13 @@ This repository contains :
 
         $ cd ngen-data
 
-        $ `wget --no-parent https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-001/AWI_03W_113060_001.tar.gz`
+        $ `wget --no-parent https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-001/AWI_03W_113060_001.tar.gz` 
+        OR
+        Use browser to download the data from https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-001/AWI_03W_113060_001.tar.gz
 
      - Untar:
         $ tar -xvf AWI_03W_113060_001.tar.gz
+        
      - Copy the path from below command:
         $ pwd
 
