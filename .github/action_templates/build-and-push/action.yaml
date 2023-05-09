@@ -17,7 +17,9 @@ runs:
     - name: Login to Docker Hub
       shell: bash
       run: |
-          echo "${{ inputs.docker-auth-token }}" | docker login --username awiciroh --password-stdin     
+          echo "${{ inputs.docker-auth-token }}" | docker login --username awiciroh --password-stdin
+    - name: Clean docker cache
+      run: docker system prune -af
     - name: Build and tag Docker image
       shell: bash
       run: docker build -t awiciroh/ciroh-ngen-image:${{ inputs.github-sha }} -t awiciroh/ciroh-ngen-image:latest-${{ inputs.image-platform }} docker/.      
