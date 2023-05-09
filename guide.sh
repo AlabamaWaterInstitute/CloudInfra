@@ -62,8 +62,8 @@ echo -e "Detected ISA = $AARCH"
 if docker --version ; then
 	echo "Docker found"
 else 
-	echo "Docker not found."
-	exit 0
+	echo "Docker not found"
+	break
 fi 
 
 select modelrun in run_NextGen exit; do
@@ -95,6 +95,16 @@ docker pull awiciroh/ciroh-ngen-image:latest-x86
 echo -e "pulled x86 ngen image"
 IMAGE_NAME=awiciroh/ciroh-ngen-image:latest-x86
 fi
+
+select modelrun in run_NextGen exit; do
+
+  case $modelrun in
+    run_NextGen)
+      echo "Pulling and running AWI NextGen Image"
+      break
+      ;;
+    exit)
+      echo "Have a nice day."
 echo -e "Running NextGen in Docker."
 echo -e "Running container mounting local host directory $HOST_DATA_PATH to /ngen/ngen/data within the container."
 docker run --rm -it -v $HOST_DATA_PATH:/ngen/ngen/data $IMAGE_NAME /ngen/ngen/data/
