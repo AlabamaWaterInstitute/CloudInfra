@@ -9,11 +9,23 @@ This repository contains :
 
 `git clone https://github.com/AlabamaWaterInstitute/CloudInfra.git`
 
+## Prerequisites:
+
+1. Install docker in local machine
+2. Download the input data in "ngen-data" folder under $PATH (any location in local machine) :
+    Sample data is available on S3 bucket that can be downloaded using below command:
+    `wget --no-parent https://ciroh-ua-ngen-data.s3.us-east-2.amazonaws.com/AWI-001/AWI_03W_113060_001.tar.gz`
+
+    Untar using:
+    cd $PATH/ngen-data
+    Run `tar -xvf AWI_03W_113060_001.tar.gz`
+    pwd (copy the path of AWI_03W_113060_001 folder).
+
 ## Run the script:
 
 ### Guide.sh - Bash script that is used to run the NGEN model. 
 
-1.	The script first prompts for entering the Input data directory file path where forcings and config files are stored.
+1.	The script first prompts for entering the Input data directory file path where forcings and config files are stored. (Prerequisites Step#2 - copied path)
 
 2.	It sets the provided directory to `HOST_DATA_PATH` variable and use it. It then uses the find command to find all of the catchment, nexus, and realization files in the working directory.
 
