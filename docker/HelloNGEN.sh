@@ -105,5 +105,4 @@ select interact in interactive-shell copy exit; do
       ;;
   esac
 done
-#cp /ngen/ngen/*.csv /ngen/ngen/data/outputs
 exit
