@@ -39,13 +39,38 @@ read -rp "Enter your data directory file path: " HOST_DATA_PATH
 echo -e "The Directory you've given is:" && echo "$HOST_DATA_PATH"
 
 Outputs_Count=$(ls $HOST_DATA_PATH/outputs | wc -l)
-
+Forcings_Count=$(ls $HOST_DATA_PATH/forcings | wc -l)
+Config_Count=$(ls $HOST_DATA_PATH/config | wc -l)
 
 #Validate paths exist:
-[ -d "$HOST_DATA_PATH/forcings" ] && echo -e "${BBlue}forcings${Color_Off} exists. $(ls $HOST_DATA_PATH/forcings | wc -l) forcings found." || echo -e "Error: Directory $HOST_DATA_PATH/${BBlue}forcings${Color_Off} does not exist."
-[ -d "$HOST_DATA_PATH/outputs" ] && echo -e "${BPurple}outputs${Color_Off} exists. $(ls $HOST_DATA_PATH/outputs | wc -l) outputs found." || echo -e "Error: Directory $HOST_DATA_PATH/${BPurple}outputs${Color_Off} does not exist." 
-[ -d "$HOST_DATA_PATH/config" ] && echo -e "${BGreen}config${Color_Off} exists. $(ls $HOST_DATA_PATH/config | wc -l) configs found." || echo -e "Error: Directory $HOST_DATA_PATH/${BGreen}config${Color_Off} does not exist."
+[ -d "$HOST_DATA_PATH/forcings" ] && echo -e "${BBlue}forcings${Color_Off} exists. $Forcings_Count forcings found." || echo -e "Error: Directory $HOST_DATA_PATH/${BBlue}forcings${Color_Off} does not exist."
+[ -d "$HOST_DATA_PATH/outputs" ] && echo -e "${BPurple}outputs${Color_Off} exists. $Outputs_Count outputs found." || echo -e "Error: Directory $HOST_DATA_PATH/${BPurple}outputs${Color_Off} does not exist, but will be created if you choose to copy the outputs after the run." 
+[ -d "$HOST_DATA_PATH/config" ] && echo -e "${BGreen}config${Color_Off} exists. $Config_Count configs found." || echo -e "Error: Directory $HOST_DATA_PATH/${BGreen}config${Color_Off} does not exist."
+echo -e "\n"
+if [ $Outputs_Count -gt 0 ]; then
+    echo -e "${UYellow}Cleanup Process will delete all files in the $HOST_DATA_PATH/outputs! Be Careful.${Color_Off}"
+    select cleanup in run_outputs_cleanup continue ; do
 
+       case $cleanup in
+         run_outputs_cleanup)
+         echo "Cleaning Outputs"
+         echo "Starting Cleanup on $Outputs_Count files."
+         rm -ri $HOST_DATA_PATH/outputs
+         break
+         ;;
+       continue)
+         echo "Happy Hydro modeling."
+         break
+         ;;
+       *)
+         echo "Invalid option $REPLY, 1 to delete outputs and 2 to exit"
+         ;;
+    esac
+done
+else
+   echo -e "Outputs directory ready for run."
+fi
+echo -e "\n"
 echo "Looking in the provided directory gives us:" 
 
 HYDRO_FABRIC_CATCHMENTS=$(find $HOST_DATA_PATH -iname "*catchment*.geojson")
@@ -58,14 +83,14 @@ echo -e "${UGreen}Found these Realization files:${Color_Off}" && sleep 1 && echo
 
 #Detect Arch
 AARCH=$(uname -a)
+echo -e "\n"
 echo -e "Detected ISA = $AARCH" 
 if docker --version ; then
 	echo "Docker found"
 else 
 	echo "Docker not found"
-	break
 fi 
-
+echo -e "Type 1 to run NextGen or type 2 to exit"
 select modelrun in run_NextGen exit; do
 
   case $modelrun in
@@ -83,7 +108,6 @@ select modelrun in run_NextGen exit; do
   esac
 done
 
-
 if uname -a | grep arm64 || uname -a | grep aarch64 ; then
 
 docker pull awiciroh/ciroh-ngen-image:latest-arm
@@ -95,7 +119,7 @@ docker pull awiciroh/ciroh-ngen-image:latest-x86
 echo -e "pulled x86 ngen image"
 IMAGE_NAME=awiciroh/ciroh-ngen-image:latest-x86
 fi
-
+echo -e "\n"
 echo -e "Running NextGen in Docker."
 echo -e "Running container mounting local host directory $HOST_DATA_PATH to /ngen/ngen/data within the container."
 docker run --rm -it -v $HOST_DATA_PATH:/ngen/ngen/data $IMAGE_NAME /ngen/ngen/data/
