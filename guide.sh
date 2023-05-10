@@ -84,7 +84,7 @@ select modelrun in run_NextGen exit; do
 done
 
 
-if uname -a | grep arm64 ; then
+if uname -a | grep arm64 || uname -a | grep aarch64 ; then
 
 docker pull awiciroh/ciroh-ngen-image:latest-arm
 echo -e "pulled arm ngen image"
