@@ -26,9 +26,9 @@ Color_Off='\033[0m'       # Text Reset
 
 set -e
 
-echo -e "${UWhite}Welcome to CIROH-UA : Nextgen National Water Model guide!${Color_Off}"
+echo -e "${UWhite}Welcome to CIROH-UA : NextGen National Water Model Guide!${Color_Off}"
 
-echo -e "Looking for a directory containing the following directories: forcings outputs config"
+echo -e "Looking for a directory containing the following directories: forcings outputs config \n"
 echo -e "${BBlue}forcings${Color_Off} is the input data for your model(s)."
 echo -e "${BPurple}outputs${Color_Off} is where we'll put your data when it's finished running"
 echo -e "${BGreen}config${Color_Off} is where changes to models can be made"
@@ -48,18 +48,18 @@ Config_Count=$(ls $HOST_DATA_PATH/config | wc -l)
 [ -d "$HOST_DATA_PATH/config" ] && echo -e "${BGreen}config${Color_Off} exists. $Config_Count configs found." || echo -e "Error: Directory $HOST_DATA_PATH/${BGreen}config${Color_Off} does not exist."
 echo -e "\n"
 if [ $Outputs_Count -gt 0 ]; then
-    echo -e "${UYellow}Cleanup Process will delete all files in the $HOST_DATA_PATH/outputs! Be Careful.${Color_Off}"
+    echo -e "${UYellow}Cleanup Process will delete all files in this folder: $HOST_DATA_PATH/outputs! Be Careful.${Color_Off}"
     select cleanup in run_outputs_cleanup continue ; do
 
        case $cleanup in
          run_outputs_cleanup)
          echo "Cleaning Outputs"
-         echo "Starting Cleanup on $Outputs_Count files."
+         echo "Starting Cleanup on Files: $Outputs_Count"
          rm -ri $HOST_DATA_PATH/outputs
          break
          ;;
        continue)
-         echo "Happy Hydro modeling."
+         echo "Happy Hydro Modeling."
          break
          ;;
        *)
@@ -90,7 +90,7 @@ if docker --version ; then
 else 
 	echo "Docker not found"
 fi 
-echo -e "Type 1 to run NextGen or type 2 to exit"
+echo -e "Type 1 to run NextGen Water Model or type 2 to exit"
 select modelrun in run_NextGen exit; do
 
   case $modelrun in
