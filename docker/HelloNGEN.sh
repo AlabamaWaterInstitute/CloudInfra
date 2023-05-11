@@ -72,10 +72,10 @@ echo ""
 
 case $option in 
   "Run NextGen model in serial mode")
-    mpirun -n $procs /dmod/bin/$option $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
+    /dmod/bin/ngen-serial $n1 all $n2 all $n3 
   ;;
   "Run NextGen model in parallel mode")
-    /dmod/bin/$option $n1 all $n2 all $n3
+    mpirun -n $procs /dmod/bin/ngen-parallel $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
   ;;
 esac
 
