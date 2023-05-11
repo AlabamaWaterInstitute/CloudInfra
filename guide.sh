@@ -110,10 +110,6 @@ options=("Run NextGen Model using docker" "Exit")
 select option in "${options[@]}"; do
   case $option in
    "Run NextGen Model using docker")
-#echo -e "Type 1 to run NextGen Water Model or type 2 to exit"
-#select modelrun in run_NextGen exit; do
-#  case $modelrun in
-#    run_NextGen)
       echo "Pulling NextGen docker image and running the model"
       break
       ;;
