@@ -22,10 +22,11 @@ generate_partition () {
 }
 
 PS3="Select an option (type a number): "
-options=("Run NextGen model in serial mode" "Run NextGen Model in parallel mode " "Run Bash shell" "Exit")
+options=("Run NextGen model in serial mode" "Run NextGen model in parallel mode " "Run Bash shell" "Exit")
 select option in "${options[@]}"; do
   case $option in
     "Run NextGen model in serial mode")
+      echo -e "\n"
       read -p "Enter the hydrofabric catchment file path from above: " n1
       echo "$n1 selected"
       read -p "Enter the hydrofabric nexus file path from above: " n2
@@ -38,6 +39,7 @@ select option in "${options[@]}"; do
       break
       ;;
     "Run NextGen model in parallel mode")
+      echo -e "\n"
       read -p "Enter the hydrofabric catchment file path: " n1
       echo "$n1 selected"
       read -p "Enter the hydrofabric nexus file path: " n2
