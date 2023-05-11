@@ -34,7 +34,7 @@ select option in "${options[@]}"; do
       echo "$n3 selected"
       echo ""
       echo ""
-      echo "Your NGEN run command is /dmod/bin/$option $n1 \"\" $n2 \"\" $n3"
+      echo "Your NGEN run command is /dmod/bin/ngen-serial $n1 \"\" $n2 \"\" $n3"
       break
       ;;
     "Run NextGen model in parallel mode")
@@ -49,7 +49,7 @@ select option in "${options[@]}"; do
       generate_partition $n1 $n2 $procs
       echo ""
       echo ""
-      echo "Your NGEN run command is mpirun -n $procs /dmod/bin/$option $n1 \"\" $n2 \"\" $n3 $(pwd)/partitions_$procs.json"
+      echo "Your NGEN run command is mpirun -n $procs /dmod/bin/ngen-parallel $n1 \"\" $n2 \"\" $n3 $(pwd)/partitions_$procs.json"
       break
       ;;
     "Run Bash shell")
@@ -67,7 +67,6 @@ select option in "${options[@]}"; do
 done
 echo "If your model didn't run, or encountered an error, try checking the Forcings paths in the Realizations file you selected."
 echo "Your model run is beginning!"
-sleep(20)
 echo ""
 
 case $option in 
