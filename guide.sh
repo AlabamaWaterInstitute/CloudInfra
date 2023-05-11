@@ -26,15 +26,19 @@ Color_Off='\033[0m'       # Text Reset
 
 set -e
 
-echo -e "${UWhite} Welcome to CIROH-UA:NextGen National Water Model App! ${Color_Off}"
-
-echo -e "Looking for a directory containing the following directories: forcings outputs config \n"
-echo -e "${BBlue}forcings${Color_Off} is the input data for your model(s)."
-echo -e "${BPurple}outputs${Color_Off} is where we'll put your data when it's finished running"
-echo -e "${BGreen}config${Color_Off} is where changes to models can be made"
 echo -e "\n"
-echo -e "Make sure to use an absolute path."
-read -rp "Enter your input data directory path: " HOST_DATA_PATH
+echo "========================================================="
+echo -e "${UWhite} Welcome to CIROH-UA:NextGen National Water Model App! ${Color_Off}"
+echo "========================================================="
+echo -e "\n"
+echo -e "Looking for input data (a directory containing the following directories: forcings, config and outputs): \n"
+
+echo -e "${BBlue}forcings${Color_Off} is the hydrofabric input data for your model(s)."
+echo -e "${BGreen}config${Color_Off} folder has all the configuration related files for the model."
+echo -e "${BPurple}outputs${Color_Off} is where the output files are copied to when the model finish the run"
+
+echo -e "\n"
+read -rp "Enter your input data directory path (use absolute path): " HOST_DATA_PATH
 
 echo -e "The Directory you've given is:" && echo "$HOST_DATA_PATH"
 
@@ -46,30 +50,39 @@ Config_Count=$(ls $HOST_DATA_PATH/config | wc -l)
 [ -d "$HOST_DATA_PATH/forcings" ] && echo -e "${BBlue}forcings${Color_Off} exists. $Forcings_Count forcings found." || echo -e "Error: Directory $HOST_DATA_PATH/${BBlue}forcings${Color_Off} does not exist."
 [ -d "$HOST_DATA_PATH/outputs" ] && echo -e "${BPurple}outputs${Color_Off} exists. $Outputs_Count outputs found." || echo -e "Error: Directory $HOST_DATA_PATH/${BPurple}outputs${Color_Off} does not exist, but will be created if you choose to copy the outputs after the run." 
 [ -d "$HOST_DATA_PATH/config" ] && echo -e "${BGreen}config${Color_Off} exists. $Config_Count configs found." || echo -e "Error: Directory $HOST_DATA_PATH/${BGreen}config${Color_Off} does not exist."
-echo -e "\n"
-if [ $Outputs_Count -gt 0 ]; then
-    echo -e "${UYellow}Cleanup Process will delete all files in this folder: $HOST_DATA_PATH/outputs! Be Careful.${Color_Off}"
-    select cleanup in run_outputs_cleanup continue ; do
 
-       case $cleanup in
-         run_outputs_cleanup)
-         echo "Cleaning Outputs folder for fresh run"
-         echo "Starting Cleanup of Files: $Outputs_Count"
-         rm -f $HOST_DATA_PATH/outputs/*
-         break
-         ;;
-       continue)
-         echo "Happy Hydro Modeling."
-         break
-         ;;
-       *)
-         echo "Invalid option $REPLY, type 1 to delete output files and 2 to exit"
-         ;;
-    esac
-done
+echo -e "\n"
+
+if [ $Outputs_Count -gt 0 ]; then
+    echo -e "${UYellow}Cleanup Process: This step will delete all files in the outputs folder: $HOST_DATA_PATH/outputs! Be Careful.${Color_Off}"
+    PS3="Select an option (type a number): "
+    options=("Delete output files and run fresh" "Continue without cleaning" "Exit")
+    select option in "${options[@]}"; do
+        case $option in
+            "Delete output files and run fresh")
+                echo "Cleaning Outputs folder for fresh run"
+                echo "Starting Cleanup of Files: $Outputs_Count"
+                rm -f "$HOST_DATA_PATH/outputs"/*
+                break
+                ;;
+            "Continue without cleaning")
+                echo "Happy Hydro Modeling."
+                break
+                ;;
+            "Exit")
+                echo "Have a nice day!"
+		exit 0
+                ;;
+            *)
+                echo "Invalid option $REPLY. Please select again."
+                ;;
+        esac
+    done
 else
-   echo -e "Outputs directory is empty and model is ready for run."
+    echo -e "Outputs directory is empty and model is ready for run."
 fi
+
+
 echo -e "\n"
 echo "Looking in the provided directory gives us:" 
 
@@ -86,20 +99,26 @@ AARCH=$(uname -a)
 echo -e "\n"
 echo -e "Detected ISA = $AARCH" 
 if docker --version ; then
-	echo "Docker found \n"
+	echo "Docker found"
 else 
-	echo "Docker not found \n"
+	echo "Docker not found"
 fi 
-echo -e "Type 1 to run NextGen Water Model or type 2 to exit"
-select modelrun in run_NextGen exit; do
+echo -e "\n"
 
-  case $modelrun in
-    run_NextGen)
+PS3="Select an option (type a number): "
+options=("Run NextGen Model using docker" "Exit")
+select option in "${options[@]}"; do
+  case $option in
+   "Run NextGen Model using docker")
+#echo -e "Type 1 to run NextGen Water Model or type 2 to exit"
+#select modelrun in run_NextGen exit; do
+#  case $modelrun in
+#    run_NextGen)
       echo "Pulling NextGen docker image and running the model"
       break
       ;;
-    exit)
-      echo "Have a nice day."
+    Exit)
+      echo "Have a nice day!"
       exit 0
       ;;
     *) 
@@ -107,6 +126,7 @@ select modelrun in run_NextGen exit; do
       ;;
   esac
 done
+echo -e "\n"
 
 if uname -a | grep arm64 || uname -a | grep aarch64 ; then
 
@@ -119,9 +139,10 @@ docker pull awiciroh/ciroh-ngen-image:latest-x86
 echo -e "Pulled awiciroh/ciroh-ngen-image:latest-x86 image"
 IMAGE_NAME=awiciroh/ciroh-ngen-image:latest-x86
 fi
+
 echo -e "\n"
 echo -e "Running NextGen docker container..."
-echo -e "Running container mounting local host directory $HOST_DATA_PATH to /ngen/ngen/data within the container."
+echo -e "Mounting local host directory $HOST_DATA_PATH to /ngen/ngen/data within the container."
 docker run --rm -it -v $HOST_DATA_PATH:/ngen/ngen/data $IMAGE_NAME /ngen/ngen/data/
 
 Final_Outputs_Count=$(ls $HOST_DATA_PATH/outputs | wc -l)
