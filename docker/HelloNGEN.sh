@@ -22,7 +22,7 @@ generate_partition () {
 }
 
 PS3="Select an option (type a number): "
-options=("Run NextGen model in serial mode" "Run NextGen model in parallel mode " "Run Bash shell" "Exit")
+options=("Run NextGen model in serial mode" "Run NextGen model in parallel mode" "Run Bash shell" "Exit")
 select option in "${options[@]}"; do
   case $option in
     "Run NextGen model in serial mode")
