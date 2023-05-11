@@ -27,7 +27,9 @@ This repository contains :
 4. Download the input data in "ngen-data" folder :
 
         - Download input data from S3 bucket:
-                $ cd ~/Documents/NextGen
+                $ cd ~/Documents
+                $ mkdir NextGen
+                $ cd NextGen
                 $ mkdir ngen-data
                 $ cd ngen-data
 
@@ -47,9 +49,7 @@ This repository contains :
 
 Clone the repo using below commands:
 
-    $ cd ~/Documents
-    $ mkdir NextGen
-    $ cd NextGen
+    $ cd ~/Documents/NextGen
     $ git clone https://github.com/AlabamaWaterInstitute/CloudInfra.git
     $ cd CloudInfra
     
