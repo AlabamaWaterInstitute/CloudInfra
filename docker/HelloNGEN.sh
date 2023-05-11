@@ -34,8 +34,7 @@ select option in "${options[@]}"; do
       echo "$n3 selected"
       echo ""
       echo ""
-      echo "Your NGEN run command is /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3"
-      /dmod/bin/$opt $n1 all $n2 all $n3
+      echo "Your NGEN run command is /dmod/bin/$option $n1 \"\" $n2 \"\" $n3"
       break
       ;;
     "Run NextGen model in parallel mode")
@@ -50,13 +49,11 @@ select option in "${options[@]}"; do
       generate_partition $n1 $n2 $procs
       echo ""
       echo ""
-      echo "Your NGEN run command is mpirun -n $procs /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3 $(pwd)/partitions_$procs.json"
-      mpirun -n $procs /dmod/bin/$opt $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
+      echo "Your NGEN run command is mpirun -n $procs /dmod/bin/$option $n1 \"\" $n2 \"\" $n3 $(pwd)/partitions_$procs.json"
       break
       ;;
     "Run Bash shell")
       echo "Starting a shell, simply exit to stop the process."
-      echo "Your NGEN serial run command is /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3"
       cd ${workdir}
       /bin/bash
       ;;
@@ -73,14 +70,14 @@ echo "Your model run is beginning!"
 sleep(20)
 echo ""
 
-#case $opt in 
-#  ngen-parallel)
-#    mpirun -n $procs /dmod/bin/$opt $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
-#  ;;
-#  ngen-serial)
-#    /dmod/bin/$opt $n1 all $n2 all $n3
-#  ;;
-#esac
+case $option in 
+  "Run NextGen model in serial mode")
+    mpirun -n $procs /dmod/bin/$option $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
+  ;;
+  "Run NextGen model in parallel mode")
+    /dmod/bin/$option $n1 all $n2 all $n3
+  ;;
+esac
 
 echo "Would you like to continue?"
 PS3="Select an option (type a number): "
