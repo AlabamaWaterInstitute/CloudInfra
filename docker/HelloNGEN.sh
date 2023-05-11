@@ -2,8 +2,9 @@
 workdir="${1:-/ngen}"
 cd ${workdir}
 set -e
-echo "Working directory is " 
+echo "Working directory is :" 
 pwd
+echo -e "\n"
 
 HYDRO_FABRIC_CATCHMENTS=$(find ${workdir} -name "*catchment*.geojson")
 HYDRO_FABRIC_NEXUS=$(find ${workdir} -name "*nexus*.geojson")
@@ -12,7 +13,7 @@ NGEN_REALIZATIONS=$(find ${workdir} -name "*realization*.json")
 echo -e "\e[4mFound these Catchment files in ${workdir}:\e[0m" && sleep 1 && echo "$HYDRO_FABRIC_CATCHMENTS"
 echo -e "\e[4mFound these Nexus files in ${workdir}:\e[0m" && sleep 1 && echo "$HYDRO_FABRIC_NEXUS"
 echo -e "\e[4mFound these Realization files in ${workdir}:\e[0m" && sleep 1 && echo "$NGEN_REALIZATIONS"
-
+echo -e "\n"
 generate_partition () {
   # $1 catchment json file
   # $2 nexus json file
@@ -20,10 +21,24 @@ generate_partition () {
   /dmod/bin/partitionGenerator $1 $2 partitions_$3.json $3 '' ''
 }
 
-select opt in ngen-parallel ngen-serial bash quit; do
-
-  case $opt in
-    ngen-parallel)
+PS3="Select an option (type a number): "
+options=("Run NextGen model in serial mode" "Run NextGen Model in parallel mode " "Run Bash shell" "Exit")
+select option in "${options[@]}"; do
+  case $option in
+    "Run NextGen model in serial mode")
+      read -p "Enter the hydrofabric catchment file path from above: " n1
+      echo "$n1 selected"
+      read -p "Enter the hydrofabric nexus file path from above: " n2
+      echo "$n2 selected"
+      read -p "Enter the Realization file path from above: " n3
+      echo "$n3 selected"
+      echo ""
+      echo ""
+      echo "Your NGEN run command is /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3"
+      /dmod/bin/$opt $n1 all $n2 all $n3
+      break
+      ;;
+    "Run NextGen model in parallel mode")
       read -p "Enter the hydrofabric catchment file path: " n1
       echo "$n1 selected"
       read -p "Enter the hydrofabric nexus file path: " n2
@@ -36,60 +51,49 @@ select opt in ngen-parallel ngen-serial bash quit; do
       echo ""
       echo ""
       echo "Your NGEN run command is mpirun -n $procs /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3 $(pwd)/partitions_$procs.json"
-      echo "Copy and paste it into the terminal to run your model."
+      mpirun -n $procs /dmod/bin/$opt $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
       break
       ;;
-    ngen-serial)
-      read -p "Enter the hydrofabric catchment file path: " n1
-      echo "$n1 selected"
-      read -p "Enter the hydrofabric nexus file path: " n2
-      echo "$n2 selected"
-      read -p "Enter the Realization file path: " n3
-      echo "$n3 selected"
-      echo ""
-      echo ""
-      echo "Your NGEN run command is /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3"
-      echo "Copy and paste it into the terminal to run your model."
-      break
-      ;;
-    bash)
+    "Run Bash shell")
       echo "Starting a shell, simply exit to stop the process."
+      echo "Your NGEN serial run command is /dmod/bin/$opt $n1 \"\" $n2 \"\" $n3"
       cd ${workdir}
       /bin/bash
       ;;
-    quit)
-      exit
+    "Exit")
+      exit 0
       ;;
     *) 
       echo "Invalid option $REPLY"
       ;;
   esac
 done
-echo "The tested model is /dmod/bin/ngen-serial /ngen/data/catchment_data.geojson "" /ngen/data/nexus_data.geojson "" /ngen/ngen/data/example_realization_config.json"
 echo "If your model didn't run, or encountered an error, try checking the Forcings paths in the Realizations file you selected."
 echo "Your model run is beginning!"
+sleep(20)
 echo ""
 
-case $opt in 
-  ngen-parallel)
-    mpirun -n $procs /dmod/bin/$opt $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
-  ;;
-  ngen-serial)
-    /dmod/bin/$opt $n1 all $n2 all $n3
-  ;;
-esac
+#case $opt in 
+#  ngen-parallel)
+#    mpirun -n $procs /dmod/bin/$opt $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
+#  ;;
+#  ngen-serial)
+#    /dmod/bin/$opt $n1 all $n2 all $n3
+#  ;;
+#esac
 
 echo "Would you like to continue?"
-select interact in interactive-shell copy_data exit; do
-
-  case $interact in
-    interactive-shell)
+PS3="Select an option (type a number): "
+options=("Interactive-Shell" "Copy output data from container to local machine" "Exit")
+select option in "${options[@]}"; do
+  case $option in
+    "Interactive-Shell")
       echo "Starting a shell, simply exit to stop the process."
       cd ${workdir}
       /bin/bash
       break
       ;;
-    copy_data)
+    "Copy output data from container to local machine")
       [ -d /ngen/ngen/data/outputs ] || mkdir /ngen/ngen/data/outputs
       # Loop through all of the .csv files in the /ngen/ngen/data directory
       for i in /ngen/ngen/data/*.csv; do
@@ -117,7 +121,7 @@ select interact in interactive-shell copy_data exit; do
       done
       break
       ;;
-    exit)
+    "Exit")
       echo "Have a nice day."
       break
       ;;
