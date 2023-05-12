@@ -146,5 +146,5 @@ Final_Outputs_Count=$(ls $HOST_DATA_PATH/outputs | wc -l)
 
 echo -e "$Final_Outputs_Count new outputs created."
 echo -e "Any copied files can be found here: $HOST_DATA_PATH/outputs"
-echo -e "Have a nice day!"
+echo -e "Thank you for running NextGen In A Box: National Water Model! Have a nice day!"
 exit 0
