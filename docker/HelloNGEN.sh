@@ -11,7 +11,9 @@ HYDRO_FABRIC_NEXUS=$(find ${workdir} -name "*nexus*.geojson")
 NGEN_REALIZATIONS=$(find ${workdir} -name "*realization*.json")
 #pwd
 echo -e "\e[4mFound these Catchment files in ${workdir}:\e[0m" && sleep 1 && echo "$HYDRO_FABRIC_CATCHMENTS"
+echo -e "\n"
 echo -e "\e[4mFound these Nexus files in ${workdir}:\e[0m" && sleep 1 && echo "$HYDRO_FABRIC_NEXUS"
+echo -e "\n"
 echo -e "\e[4mFound these Realization files in ${workdir}:\e[0m" && sleep 1 && echo "$NGEN_REALIZATIONS"
 echo -e "\n"
 generate_partition () {
