@@ -74,10 +74,10 @@ echo "Your model run is beginning!"
 echo ""
 
 case $option in 
-  "Run NextGen model in serial mode")
+  "Run NextGen model framework in serial mode")
     /dmod/bin/ngen-serial $n1 all $n2 all $n3 
   ;;
-  "Run NextGen model in parallel mode")
+  "Run NextGen model framework in parallel mode")
     mpirun -n $procs /dmod/bin/ngen-parallel $n1 all $n2 all $n3 $(pwd)/partitions_$procs.json
   ;;
 esac
