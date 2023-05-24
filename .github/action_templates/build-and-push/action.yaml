@@ -29,4 +29,4 @@ runs:
       shell: bash
       run: |
         docker push awiciroh/ciroh-ngen-image:${{ inputs.github-sha }} 
-        docker push awiciroh/ciroh-ngen-image:latest-${{ inputs.image-platform }}
+        #docker push awiciroh/ciroh-ngen-image:latest-${{ inputs.image-platform }}
