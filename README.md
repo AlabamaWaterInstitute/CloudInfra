@@ -1,5 +1,13 @@
 # Welcome to NextGen Framework National Water Model Community Repo. (NextGen In A Box).
 
+``` diff
+- NOTE: This repository has been moved to it's new location : https://github.com/CIROH-UA/CloudInfra
+- Please do all active work on : https://github.com/CIROH-UA/CloudInfra
+- This repository has been archived and made Read Only.
+```
+
+====================================================================================================
+
 This repository contains :
 - **Dockerfile** for running NextGen Framework (docker/Dockerfile)
 - **Terraform** configuration files for provisioning infrastructure in AWS (terraform/README.md)
